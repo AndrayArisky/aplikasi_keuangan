@@ -1,5 +1,6 @@
 import 'dart:async';
 //import 'package:apkeu/loginPage.dart';
+import 'package:aplikasi_keuangan/transaksiPage/loginPage.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -20,10 +21,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(Duration(seconds: 3), () {
-      // Navigator.of(context).pushReplacement(MaterialPageRoute(
-      //   builder: (context) => loginPage(),
-      // ));
+    Timer(Duration(seconds: 2), () {
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => loginPage(),
+      ));
     });
   }
 

@@ -1,75 +1,114 @@
 import 'package:flutter/material.dart';
 
-class labaRugi extends StatefulWidget {
-
-  @override
-  labaRugiState createState() => labaRugiState();
-}
-
-class labaRugiState extends State<labaRugi> {
-  // List of available months
-  List<String> months = [
-    'Januari',
-    'Februari',
-    'Maret',
-    'April',
-    'Mei',
-    'Juni',
-    'Juli',
-    'Agustus',
-    'September',
-    'Oktober',
-    'November',
-    'Desember',
-  ];
-
-  String selectedMonth = 'Januari'; // Default selected month
-
-  // Method to handle month selection
-  void _onMonthSelected(String month) {
-    setState(() {
-      selectedMonth = month;
-    });
-  }
-
+class labaRugi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Laporan Laba Rugi'),
       ),
-      body: Center(
+      body: Padding(
+        padding: EdgeInsets.all(20.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
             Text(
-              'Pilih Bulan',
-              style: TextStyle(fontSize: 20),
+              'Bulan: September 2023',
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            SizedBox(height: 10),
-            DropdownButton<String>(
-              value: selectedMonth,
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedMonth = newValue!;
-                });
-              },
-              items: months.map((String month) {
-                return DropdownMenuItem<String>(
-                  value: month,
-                  child: Text(month),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Laporan Laba Rugi untuk $selectedMonth',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            // Add your profit and loss report widgets here based on the selected month
+            SizedBox(height: 20.0),
+            _buildItemRow('Pendapatan'),
+            SizedBox(height: 10.0),
+            _buildAkunRow('Pendapatan Jasa', 'Rp.100.000.000'),
+            _buildAkunRow('Pendapatan GiveAway', 'Rp.50.000.000'),
+            _buildAkunRow('Dapat Dari Baim Wong', 'Rp.5.000.000'),
+            Divider(),
+            _buildTotalRow('Total Pendapatan', 'Rp 155.000.000'),
+            Divider(),
+
+            SizedBox(height: 20.0),
+            _buildItemRow('Biaya/Beban'),
+            SizedBox(height: 10.0),
+            _buildAkunRow('Harga Pokok Penjualan', 'Pengeluaran'),
+            _buildAkunRow('Beban Perlengkapan/ATK', 'Pengeluaran'),
+            _buildAkunRow('Beban Gaji Karyawan', 'Pengeluaran'),
+            _buildAkunRow('Beban Sewa', 'Pengeluaran'),
+            _buildAkunRow('Beban Listrik', 'Pengeluaran'),
+            _buildAkunRow('Beban Air', 'Pengeluaran'),
+            _buildAkunRow('Beban Lain-lain', 'Pengeluaran'),
+            Divider(),
+            _buildTotalRow('Total Biaya/Beban', 'Rp 50.000.000'),
+            Divider(),
+
+            SizedBox(height: 40.0),
+            _buildTotalRow('Total Laba/Rugi', 'Rp 155.000.000'),
+            _buildTotalRow('Total Beban Biaya', 'Rp 155.000.000'),
+            _buildTotalRow('Total Beban Pajak', 'Rp 155.000.000'),
           ],
         ),
       ),
     );
   }
+
+  Widget _buildItemRow(String title) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAkunRow(String title, String amount) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 14.0,
+          ),
+        ),
+        Text(
+          amount,
+          style: TextStyle(
+            fontSize: 14.0,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTotalRow(String title, String amount) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          amount,
+          style: TextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
 }
+
+

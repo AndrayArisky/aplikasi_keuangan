@@ -5,6 +5,16 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
+class Tipe{
+  final String title;
+  final String type;
+
+  Tipe({
+    required this.title, 
+    required this.type
+  });
+}
+
 class inputAdmin extends StatefulWidget {
   final id_user;
   inputAdmin({required this.id_user});
@@ -14,14 +24,29 @@ class inputAdmin extends StatefulWidget {
 }
 
 class inputAdminState extends State<inputAdmin> {
+
+  List<Tipe> pemasukanData = [
+    Tipe(title: 'Pendapatan Jasa', type: 'Pemasukan'),
+    Tipe(title: 'Pendapatan Giveaway', type: 'Pemasukan'),
+    Tipe(title: 'Dapat Dari Baim Wong', type: 'Pemasukan'),
+  ];
+  List<Tipe> pengeluaranData = [
+    Tipe(title: 'Harga Pokok Penjualan', type: 'Pengeluaran'),
+    Tipe(title: 'Beban Perlengkapan/ATK', type: 'Pengeluaran'),
+    Tipe(title: 'Beban Gaji Karyawan', type: 'Pengeluaran'),
+    Tipe(title: 'Beban Sewa', type: 'Pengeluaran'),
+    Tipe(title: 'Beban Listrik', type: 'Pengeluaran'),
+    Tipe(title: 'Beban Air', type: 'Pengeluaran'),
+    Tipe(title: 'Beban Lain-lain', type: 'Pengeluaran'),
+  ];
+
   int? selected = -1;
   int selectedIndex = 2;
-  //bool buttonStatus = true;
-  //late int type;
-  String status = 'Pemasukan';
+  String status = 'Pengeluaran';
   DateTime selectedDate = DateTime.now();
   String _formatNominal = '';
   late dynamic id_user;
+  String? selectedOption;
 
   final kategori = TextEditingController();
   final nominal = TextEditingController();
@@ -97,11 +122,6 @@ class inputAdminState extends State<inputAdmin> {
     }
   }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  // }
-
   // FUNGSI TOMBOL
   void onChanged(int? value) {
     setState(() {
@@ -131,6 +151,56 @@ class inputAdminState extends State<inputAdmin> {
     }
   }
 
+  void addExpense() {
+    setState(() {
+      status = 'Pengeluaran';
+      selectedIndex = 2;
+      kategori.clear();
+    });
+  }
+
+  void addIncome() {
+    setState(() {
+      status = 'Pemasukan';
+      selectedIndex = 1;
+      kategori.clear();
+    });
+  }
+
+  void _showModalBottomSheet(List<Tipe> data) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: data.length,
+                itemBuilder: (BuildContext context, int index) {
+                  Tipe transaction = data[index];
+                  return ListTile(
+                    title: Text(transaction.title),
+                    onTap: () {
+                      setState(() {
+                        selectedOption = transaction.title;
+                        kategori.text = transaction.title;
+                      });
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -138,12 +208,35 @@ class inputAdminState extends State<inputAdmin> {
           title: Text('Tambah Transaksi'),
         ),
         body: Container(
-          padding: EdgeInsets.all(20),
-          child: Column(children: <Widget>[
+          padding: EdgeInsets.only(top: 35, right: 20, left: 20, bottom: 20),
+          child: Column(
+            children: <Widget>[
             // TOMBOL PEMASUKAN DAN PENGELUARAN
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor:
+                          selectedIndex == 2 ? Colors.red : Colors.grey,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero),
+                    ),
+                    child: Text(
+                      "PENGELUARAN",
+                      style: TextStyle(fontSize: 15),
+                    ),
+                    onPressed: () {
+                      addExpense();
+                      setState(() {
+                        selectedIndex = 2;
+                        status = 'Pengeluaran';
+                      });
+                    },
+                  ),
+                ),
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -160,6 +253,7 @@ class inputAdminState extends State<inputAdmin> {
                       ),
                     ),
                     onPressed: () {
+                      addIncome();
                       setState(() {
                         selectedIndex = 1;
                         status = 'Pemasukan';
@@ -167,38 +261,46 @@ class inputAdminState extends State<inputAdmin> {
                     },
                   ),
                 ),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor:
-                          selectedIndex == 2 ? Colors.red : Colors.grey,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero),
-                    ),
-                    child: Text(
-                      "PENGELUARAN",
-                      style: TextStyle(fontSize: 15),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        selectedIndex = 2;
-                        status = 'Pengeluaran';
-                      });
-                    },
-                  ),
-                ),
+                
               ],
             ),
 
-            SizedBox(height: 20.0),
-            // KATEGORI
+            SizedBox(height: 10.0),
+            if (status == 'Pengeluaran')
             TextField(
               controller: kategori, 
               decoration: InputDecoration(
-                  icon: Icon(Icons.category_outlined),
-                  labelText: "Kategori" 
-                  ),
+                icon: Icon(Icons.category_outlined),
+                labelText: "Kategori $status",
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    
+                    // Lakukan sesuatu saat tombol ikon ditekan
+                    _showModalBottomSheet(pengeluaranData);
+                    // String text = kategori.text;
+                    // print('Nilai yang dimasukkan: $text');
+                  },
+                  icon: Icon(Icons.add),
+                ),
+              ),
+            ),
+            if (status == 'Pemasukan')
+            TextField(
+              controller: kategori, 
+              decoration: InputDecoration(
+                icon: Icon(Icons.category_outlined),
+                labelText: "Kategori $status",
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    
+                    // Lakukan sesuatu saat tombol ikon ditekan
+                    _showModalBottomSheet(pemasukanData);
+                    // String text = kategori.text;
+                    // print('Nilai yang dimasukkan: $text');
+                  },
+                  icon: Icon(Icons.add),
+                ),
+              ),
             ),
             
             SizedBox(height: 10.0),
@@ -233,62 +335,7 @@ class inputAdminState extends State<inputAdmin> {
                 });
               },
             ),
-            /*
-            TextField(
-              controller: date, //editing controller of this TextField
-              decoration: InputDecoration(
-                  icon: Icon(Icons.calendar_month_sharp), //icon of text field
-                  labelText: "Tanggal", //label text of field
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5.0)))),
-              readOnly:
-                  true, //set it true, so that user will not able to edit text
-              onTap: () async {
-                DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: selectedDate,
-                    firstDate: DateTime(
-                        2000), //DateTime.now() - not to allow to choose before today.
-                    lastDate: DateTime(2101));
-
-                if (pickedDate != null) {
-                  print(
-                      pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
-                  String formattedDate =
-                      DateFormat('dd-MM-yyyy').format(pickedDate);
-                  print(
-                      formattedDate); //formatted date output using intl package =>  2021-03-16
-                  //you can implement different kind of Date Format here according to your requirement
-
-                  setState(() {
-                    date.text =
-                        formattedDate; //set output date to TextField value.
-                  });
-                } else {
-                  print("Tentukan tanggal transaksi!");
-                }
-                /*
-              showDatePicker (
-                context: context,
-                initialDate: selectedDate,
-                firstDate: DateTime(2000), //DateTime.now() - not to allow to choose before today.
-                lastDate: DateTime(2101)
-              ).then((value) {
-                if (value != null) {
-                  setState(() {
-                    selectedDate = value;
-                    print(selectedDate);
-                  });
-                } else {
-                  print("Tentukan tanggal transaksi!");
-                  print('');
-                }
-              });
-              */
-              },
-            ),
-            */
-            
+                       
             SizedBox(height: 10.0),
             // NOMINAL
             TextField(
@@ -306,21 +353,6 @@ class inputAdminState extends State<inputAdmin> {
                 FilteringTextInputFormatter.digitsOnly
               ], 
             ),
-            /*
-            TextField(
-              controller: nominal, //editing controller of this TextField
-              decoration: InputDecoration(
-                  icon: Icon(Icons.attach_money), //icon of text field
-                  labelText: "Nominal", //label text of field
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5.0)))),
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                InputFormatterNominal()
-              ],
-            ),
-            */
             
             SizedBox(height: 10.0),
             // KETERANGAN
@@ -374,27 +406,25 @@ class inputAdminState extends State<inputAdmin> {
               mainAxisAlignment: MainAxisAlignment.center, 
               children: <Widget>[
                 Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
+                  child: Container(
+                    padding: EdgeInsets.only(top:20),
                     child: ElevatedButton(
                       child: Text(
                         "Tambah",
                         style: TextStyle(fontSize: 15),
                       ),
                       onPressed: () {
-                    /*
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) {
-                      return transaksi();
-                    }));
-                    */
-                      print('Id User : ${widget.id_user}');
-                      tambahTransaksi();
-                  },
-                ),
-              ))
-            ]),
-          ]),
-        ));
+                        print('Id User : ${widget.id_user}');
+                        tambahTransaksi();
+                      },
+                    ),
+                  ) 
+                )
+              ]
+            ),
+          ]
+        ),
+      )
+    );
   }
 }
