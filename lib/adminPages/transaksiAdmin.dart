@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:aplikasi_keuangan/adminPages/adminPage.dart';
 import 'package:aplikasi_keuangan/adminPages/inputAdmin.dart';
-import 'package:aplikasi_keuangan/inputFake.dart';
+import 'package:aplikasi_keuangan/adminPages/updateTransaksi.dart';
+import 'package:aplikasi_keuangan/PERCOBAAN/inputFake.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -168,8 +169,6 @@ class _transaksiAdminState extends State<transaksiAdmin> {
 
                 int PemasukanTotal = 0;
                 int PengeluaranTotal = 0;
-                int kasHarian = PemasukanTotal-PengeluaranTotal;
-                
 
                 for (int i = 0; i < transactions.length; i++) {
                   String nilaiTransaksiString =
@@ -297,10 +296,10 @@ class _transaksiAdminState extends State<transaksiAdmin> {
                                       child: ListTile(
 // ONTAP UPDATE
                                         onTap: () {
-                                          // Navigator.push(
-                                          //   context,
-                                          //   MaterialPageRoute(builder: (context) => update(id_user: 11,)),
-                                          // );
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(builder: (context) => updateTransaksi(id_user: 11,)),
+                                          );
                                         },       
                                         subtitle: Row(
                                           children: [

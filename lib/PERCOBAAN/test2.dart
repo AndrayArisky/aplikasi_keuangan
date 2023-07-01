@@ -1,34 +1,65 @@
 // import 'dart:convert';
-// import 'package:aplikasi_keuangan/karyawanPages/karyawanPage.dart';
+// import 'package:aplikasi_keuangan/adminPages/adminPage.dart';
 // import 'package:flutter/material.dart';
 // import 'package:flutter/services.dart';
 // import 'package:intl/intl.dart';
 // import 'package:http/http.dart' as http;
 
-// class inputKaryawan extends StatefulWidget {
+// // class Tipe{
+// //   final String title;
+// //   final String type;
+
+// //   Tipe({
+// //     required this.title, 
+// //     required this.type
+// //   });
+// // }
+
+// class inputSaya extends StatefulWidget {
 //   final id_user;
-//   const inputKaryawan({super.key, required this.id_user});
+//   inputSaya({required this.id_user});
 
 //   @override
-//   inputKaryawanState createState() => inputKaryawanState();
+//   inputSayaState createState() => inputSayaState();
 // }
 
-// class inputKaryawanState extends State<inputKaryawan> {
+// class inputSayaState extends State<inputSaya> {
+
+//   // List<Tipe> pemasukanData = [
+//   //   Tipe(title: 'Pendapatan Jasa', type: 'Pemasukan'),
+//   //   Tipe(title: 'Pendapatan Giveaway', type: 'Pemasukan'),
+//   //   Tipe(title: 'Dapat Dari Baim Wong', type: 'Pemasukan'),
+//   // ];
+//   // List<Tipe> pengeluaranData = [
+//   //   Tipe(title: 'Harga Pokok Penjualan', type: 'Pengeluaran'),
+//   //   Tipe(title: 'Beban Perlengkapan/ATK', type: 'Pengeluaran'),
+//   //   Tipe(title: 'Beban Gaji Karyawan', type: 'Pengeluaran'),
+//   //   Tipe(title: 'Beban Sewa', type: 'Pengeluaran'),
+//   //   Tipe(title: 'Beban Listrik', type: 'Pengeluaran'),
+//   //   Tipe(title: 'Beban Air', type: 'Pengeluaran'),
+//   //   Tipe(title: 'Beban Lain-lain', type: 'Pengeluaran'),
+//   // ];
+  
+
+//   // DI CHATGPT BUAT MUNCUL DATA DI SHOWMODALBUTTON
+
 //   int? selected = -1;
-//   int selectedIndex = 1;
-//   bool buttonStatus = true;
-//   late int type;
-//   String status = 'Pilih status';
+//   int selectedIndex = 2;
+//   String status = 'Pengeluaran';
 //   DateTime selectedDate = DateTime.now();
 //   String _formatNominal = '';
 //   late dynamic id_user;
+//   String? selectedOption;
+
+//   bool isLoading = true;
+//   List<dynamic> data = [];
 
 //   final kategori = TextEditingController();
 //   final nominal = TextEditingController();
 //   final keterangan = TextEditingController();
 
 //   // FUNGSI TOMBOL SIMPAN
-//   void simpanTransaksi() async {
+//   void tambahTransaksi() async {
 //     var url = Uri.parse('http://apkeu2023.000webhostapp.com/inputdata.php');
 //     var body = {
 //       'id_user': widget.id_user.toString(),
@@ -61,12 +92,11 @@
 //                   child: Text("OK"),
 //                   onPressed: () {
 //                     //Navigator.of(context).pop();
-//                     Navigator.pushAndRemoveUntil(
+//                     Navigator.pushReplacement(
 //                       context, 
 //                       MaterialPageRoute(
-//                         builder: (context) => karyawanPage(id_user: 22,)
-//                       ),
-//                       (Route<dynamic> route) => false,
+//                         builder: (context) => adminPage(id_user: 11)
+//                       )
 //                     );
 //                   },
 //                 )
@@ -97,11 +127,27 @@
 //       }
 //     }
 //   }
-
+  
 //   @override
 //   void initState() {
 //     super.initState();
+//     fetchData();
 //   }
+
+//   // FUNGSI AMBIL DATA AKUN
+//   Future<void> fetchData() async {
+//     final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getdata.php'));
+    
+//     if (response.statusCode == 200) {
+//       setState(() {
+//         data = json.decode(response.body);
+//         isLoading = false;
+//       });
+//     } else {
+//       throw Exception('Failed to load data from API');
+//     }
+//   }
+
 
 //   // FUNGSI TOMBOL
 //   void onChanged(int? value) {
@@ -132,40 +178,91 @@
 //     }
 //   }
 
+//   // FUNGSI PENGELUARAN
+//   void addExpense() {
+//     setState(() {
+//       status = 'Pengeluaran';
+//       selectedIndex = 2;
+//       kategori.clear();
+//     });
+//   }
+
+//   // FUNGSI PEMASUKAN
+//   void addIncome() {
+//     setState(() {
+//       status = 'Pemasukan';
+//       selectedIndex = 1;
+//       kategori.clear();
+//     });
+//   }
+
+//   void _showModalBottomSheet(String tipe) {
+//     List<dynamic> filteredData = 
+//     data.where((item) => item['tipe'] == tipe).toList();
+
+//     showModalBottomSheet(
+//       context: context,
+//       builder: (BuildContext context) {
+//         return Container(
+//           padding: EdgeInsets.all(16.0),
+//           child: Column(
+//             mainAxisSize: MainAxisSize.min,
+//             crossAxisAlignment: CrossAxisAlignment.stretch,
+//             children: [
+//               ListView.builder(
+//                 shrinkWrap: true,
+//                 itemCount: filteredData.length,
+//                 itemBuilder: (BuildContext context, int index) {
+//                   //Tipe transaction = data[index];
+//                   final item = filteredData[index];
+//                   return ListTile(
+//                     //title: Text(transaction.title),
+//                     title: Text(item['nm_akun']),
+//                     onTap: () {
+//                       setState(() {
+//                         selectedOption = item.title;
+//                         kategori.text = item.title;
+//                       });
+//                       Navigator.pop(context);
+//                     },
+//                   );
+//                 },
+//               ),
+//             ],
+//           ),
+//         );
+//       },
+//     );
+//   }
+
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
 //         appBar: AppBar(
 //           title: Text('Tambah Transaksi'),
+//           leading: IconButton(
+//             icon: Icon(Icons.arrow_back),
+//             onPressed: () {
+//               Navigator.pushAndRemoveUntil(
+//                 context,
+//                 MaterialPageRoute(
+//                   builder: (context) => adminPage(id_user: 11),
+//                 ),
+//                 (route) => false,
+//               );
+//             },
+//           ),
 //         ),
-//         body: Container(
-//           padding: EdgeInsets.all(16),
-//           child: Column(children: <Widget>[
+//         body: isLoading ? Center (
+//           child: CircularProgressIndicator(),
+//         ) : Container(
+//           padding: EdgeInsets.only(top: 35, right: 20, left: 20, bottom: 20),
+//           child: Column(
+//             children: <Widget>[
 //             // TOMBOL PEMASUKAN DAN PENGELUARAN
 //             Row(
 //               mainAxisAlignment: MainAxisAlignment.center,
 //               children: <Widget>[
-//                 Expanded(
-//                   child: ElevatedButton(
-//                     style: ElevatedButton.styleFrom(
-//                       foregroundColor: Colors.white,
-//                       backgroundColor: selectedIndex == 1 ? Colors.green : Colors.grey,
-//                       shape: RoundedRectangleBorder(
-//                         borderRadius: BorderRadius.zero
-//                       ),
-//                     ),
-//                     child: Text(
-//                       "PEMASUKAN",
-//                       style: TextStyle(fontSize:15),
-//                     ),
-//                     onPressed: () {
-//                       setState(() {
-//                         selectedIndex = 1;
-//                         status = 'Pemasukan';
-//                       });
-//                     },
-//                   ),
-//                 ),
 //                 Expanded(
 //                   child: ElevatedButton(
 //                     style: ElevatedButton.styleFrom(
@@ -180,6 +277,7 @@
 //                       style: TextStyle(fontSize: 15),
 //                     ),
 //                     onPressed: () {
+//                       addExpense();
 //                       setState(() {
 //                         selectedIndex = 2;
 //                         status = 'Pengeluaran';
@@ -187,18 +285,70 @@
 //                     },
 //                   ),
 //                 ),
+//                 Expanded(
+//                   child: ElevatedButton(
+//                     style: ElevatedButton.styleFrom(
+//                       foregroundColor: Colors.white,
+//                       backgroundColor: selectedIndex == 1 ? Colors.green : Colors.grey,
+//                       shape: RoundedRectangleBorder(
+//                         borderRadius: BorderRadius.zero
+//                       ),
+//                     ),
+//                     child: Text(
+//                       "PEMASUKAN",
+//                       style: TextStyle(
+//                         fontSize: 15,
+//                       ),
+//                     ),
+//                     onPressed: () {
+//                       addIncome();
+//                       setState(() {
+//                         selectedIndex = 1;
+//                         status = 'Pemasukan';
+//                       });
+//                     },
+//                   ),
+//                 ),
+                
 //               ],
 //             ),
 
-//             SizedBox(height: 20.0),
-//             // KATEGORI
+//             SizedBox(height: 10.0),
+//             if (status == 'Pengeluaran')
 //             TextField(
-//               controller: kategori, //editing controller of this TextField
+//               controller: kategori, 
 //               decoration: InputDecoration(
-//                   icon: Icon(Icons.category_outlined), //icon of text field
-//                   labelText: "Kategori" //label text of field
-
-//                   ),
+//                 icon: Icon(Icons.category_outlined),
+//                 labelText: "Kategori $status",
+//                 suffixIcon: IconButton(
+//                   onPressed: () {
+                    
+//                     // Lakukan sesuatu saat tombol ikon ditekan
+//                     _showModalBottomSheet('pr');
+//                     // String text = kategori.text;
+//                     // print('Nilai yang dimasukkan: $text');
+//                   },
+//                   icon: Icon(Icons.add),
+//                 ),
+//               ),
+//             ),
+//             if (status == 'Pemasukan')
+//             TextField(
+//               controller: kategori, 
+//               decoration: InputDecoration(
+//                 icon: Icon(Icons.category_outlined),
+//                 labelText: "Kategori $status",
+//                 suffixIcon: IconButton(
+//                   onPressed: () {
+                    
+//                     // Lakukan sesuatu saat tombol ikon ditekan
+//                     _showModalBottomSheet('pm');
+//                     // String text = kategori.text;
+//                     // print('Nilai yang dimasukkan: $text');
+//                   },
+//                   icon: Icon(Icons.add),
+//                 ),
+//               ),
 //             ),
             
 //             SizedBox(height: 10.0),
@@ -233,62 +383,7 @@
 //                 });
 //               },
 //             ),
-//             /*
-//             TextField(
-//               controller: date, //editing controller of this TextField
-//               decoration: InputDecoration(
-//                   icon: Icon(Icons.calendar_month_sharp), //icon of text field
-//                   labelText: "Tanggal", //label text of field
-//                   border: OutlineInputBorder(
-//                       borderRadius: BorderRadius.all(Radius.circular(5.0)))),
-//               readOnly:
-//                   true, //set it true, so that user will not able to edit text
-//               onTap: () async {
-//                 DateTime? pickedDate = await showDatePicker(
-//                     context: context,
-//                     initialDate: selectedDate,
-//                     firstDate: DateTime(
-//                         2000), //DateTime.now() - not to allow to choose before today.
-//                     lastDate: DateTime(2101));
-
-//                 if (pickedDate != null) {
-//                   print(
-//                       pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
-//                   String formattedDate =
-//                       DateFormat('dd-MM-yyyy').format(pickedDate);
-//                   print(
-//                       formattedDate); //formatted date output using intl package =>  2021-03-16
-//                   //you can implement different kind of Date Format here according to your requirement
-
-//                   setState(() {
-//                     date.text =
-//                         formattedDate; //set output date to TextField value.
-//                   });
-//                 } else {
-//                   print("Tentukan tanggal transaksi!");
-//                 }
-//                 /*
-//               showDatePicker (
-//                 context: context,
-//                 initialDate: selectedDate,
-//                 firstDate: DateTime(2000), //DateTime.now() - not to allow to choose before today.
-//                 lastDate: DateTime(2101)
-//               ).then((value) {
-//                 if (value != null) {
-//                   setState(() {
-//                     selectedDate = value;
-//                     print(selectedDate);
-//                   });
-//                 } else {
-//                   print("Tentukan tanggal transaksi!");
-//                   print('');
-//                 }
-//               });
-//               */
-//               },
-//             ),
-//             */
-            
+                       
 //             SizedBox(height: 10.0),
 //             // NOMINAL
 //             TextField(
@@ -306,21 +401,6 @@
 //                 FilteringTextInputFormatter.digitsOnly
 //               ], 
 //             ),
-//             /*
-//             TextField(
-//               controller: nominal, //editing controller of this TextField
-//               decoration: InputDecoration(
-//                   icon: Icon(Icons.attach_money), //icon of text field
-//                   labelText: "Nominal", //label text of field
-//                   border: OutlineInputBorder(
-//                       borderRadius: BorderRadius.all(Radius.circular(5.0)))),
-//               keyboardType: TextInputType.number,
-//               inputFormatters: [
-//                 FilteringTextInputFormatter.digitsOnly,
-//                 InputFormatterNominal()
-//               ],
-//             ),
-//             */
             
 //             SizedBox(height: 10.0),
 //             // KETERANGAN
@@ -330,10 +410,12 @@
 //                   icon: Icon(Icons.edit_note_rounded), //icon of text field
 //                   labelText: "Keterangan", //label text of field
 //                   border: OutlineInputBorder(
-//                       borderRadius: BorderRadius.all(Radius.circular(5.0)))),
+//                     borderRadius: BorderRadius.all(Radius.circular(5.0)
+//                     )
+//                   )
+//               ),
 //             ),
 
-//             /*
 //             SizedBox(
 //               height: 20.0
 //             ),
@@ -363,7 +445,6 @@
 //                 Text('Non-cash')
 //               ],
 //             ),
-//             */
 
 //             SizedBox(height: 25.0),
 //             // TOMBOL SIMPAN
@@ -372,25 +453,24 @@
 //               children: <Widget>[
 //                 Expanded(
 //                   child: Container(
+//                     padding: EdgeInsets.only(top:20),
 //                     child: ElevatedButton(
 //                       child: Text(
-//                         "Simpan",
+//                         "Tambah",
 //                         style: TextStyle(fontSize: 15),
 //                       ),
 //                       onPressed: () {
-//                     /*
-//                     Navigator.pushReplacement(context,
-//                         MaterialPageRoute(builder: (context) {
-//                       return transaksi();
-//                     }));
-//                     */
-//                       print('Id User : ${widget.id_user}');
-//                       simpanTransaksi();
-//                   },
-//                 ),
-//               ))
-//             ]),
-//           ]),
-//         ));
+//                         print('Id User : ${widget.id_user}');
+//                         tambahTransaksi();
+//                       },
+//                     ),
+//                   ) 
+//                 )
+//               ]
+//             ),
+//           ]
+//         ),
+//       )
+//     );
 //   }
 // }

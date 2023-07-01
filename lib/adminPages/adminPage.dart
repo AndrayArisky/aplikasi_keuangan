@@ -1,10 +1,11 @@
 import 'package:aplikasi_keuangan/adminPages/laporan/labaRugi.dart';
 import 'package:aplikasi_keuangan/adminPages/laporan/posisiKeuangan.dart';
+import 'package:aplikasi_keuangan/adminPages/profilAdmin.dart';
 import 'package:aplikasi_keuangan/adminPages/tambahAnggota.dart';
 import 'package:aplikasi_keuangan/adminPages/transaksiAdmin.dart';
 import 'package:aplikasi_keuangan/akunPages/tabBarAkun.dart';
-import 'package:aplikasi_keuangan/transaksiPage/loginPage.dart';
 import 'package:aplikasi_keuangan/karyawanPages/transaksiKaryawan.dart';
+import 'package:aplikasi_keuangan/mainPage/loginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,7 +25,8 @@ class _adminPageState extends State<adminPage>{
   var selectedPage =  [
     transaksiAdmin(),
     tabBarAkun(),
-    tabBarAkun(),
+    //ProfilPage()
+    profilAdmin(),
     // profilAdmin(), 
   ];
 
@@ -192,7 +194,7 @@ class _adminPageState extends State<adminPage>{
               text: 'Tambah Anggota',
               onTap: () {
                 Navigator. of( context ) .push ( MaterialPageRoute (
-                  builder: ( BuildContext context ) => tambahAnggota())
+                  builder: ( BuildContext context ) => tambahAnggota(id_user: 22))
                 );
               }
             ),
@@ -224,11 +226,11 @@ class _adminPageState extends State<adminPage>{
               }
               ),
             Divider(height: 15, thickness: 1),
-            _drawerItem(
-              icon: Icons.settings,
-              text: 'Pengaturan',
-              onTap: () {}
-            ),
+            // _drawerItem(
+            //   icon: Icons.settings,
+            //   text: 'Pengaturan',
+            //   onTap: () {}
+            // ),
             _drawerItem(
               icon: Icons.logout,
               text: 'Keluar',

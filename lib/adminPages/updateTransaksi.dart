@@ -5,26 +5,22 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
-class Tipe{
+class Tipe {
   final String title;
   final String type;
 
-  Tipe({
-    required this.title, 
-    required this.type
-  });
+  Tipe({required this.title, required this.type});
 }
 
-class inputAdmin extends StatefulWidget {
+class updateTransaksi extends StatefulWidget {
   final id_user;
-  inputAdmin({required this.id_user});
+  updateTransaksi({required this.id_user});
 
   @override
-  inputAdminState createState() => inputAdminState();
+  updateTransaksiState createState() => updateTransaksiState();
 }
 
-class inputAdminState extends State<inputAdmin> {
-
+class updateTransaksiState extends State<updateTransaksi> {
   List<Tipe> pemasukanData = [
     Tipe(title: 'Pendapatan Jasa', type: 'Pemasukan'),
     Tipe(title: 'Pendapatan Giveaway', type: 'Pemasukan'),
@@ -39,7 +35,6 @@ class inputAdminState extends State<inputAdmin> {
     Tipe(title: 'Beban Air', type: 'Pengeluaran'),
     Tipe(title: 'Beban Lain-lain', type: 'Pengeluaran'),
   ];
-  
 
   // DI CHATGPT BUAT MUNCUL DATA DI SHOWMODALBUTTON
 
@@ -56,15 +51,11 @@ class inputAdminState extends State<inputAdmin> {
   final keterangan = TextEditingController();
 
   // FUNGSI TOMBOL SIMPAN
-  void tambahTransaksi() async {
-    var url = Uri.parse('http://apkeu2023.000webhostapp.com/inputdata.php');
+  void updateTransaksi(String noTransaksi, Map<String, String> updatedData) async {
+    var url = Uri.parse('http://apkeu2023.000webhostapp.com/updateData.php');
     var body = {
-      'id_user': widget.id_user.toString(),
-      'kategori': kategori.text,
-      'tgl_transaksi': selectedDate.toString(),
-      'nominal': nominal.text,
-      'keterangan': keterangan.text,
-      'status': status
+      'no_transaksi': noTransaksi,
+      'updated_data' : json.encode(updatedData)
     };
 
     var response = await http.post(url, body: body);
@@ -90,10 +81,9 @@ class inputAdminState extends State<inputAdmin> {
                   onPressed: () {
                     //Navigator.of(context).pop();
                     Navigator.pushReplacement(
-                      context, 
+                      context,
                       MaterialPageRoute(
-                        builder: (context) => adminPage(id_user: 11)
-                      )
+                          builder: (context) => adminPage(id_user: 11)),
                     );
                   },
                 )
@@ -107,8 +97,7 @@ class inputAdminState extends State<inputAdmin> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text("Gagal menyimpan data!"),
-              content:
-                  Text("Pastikan data yang anda input sudah benar!"),
+              content: Text("Pastikan data yang anda input sudah benar!"),
               // content: Text(result["message"]),
               actions: <Widget>[
                 ElevatedButton(
@@ -159,8 +148,6 @@ class inputAdminState extends State<inputAdmin> {
       status = 'Pengeluaran';
       selectedIndex = 2;
       kategori.clear();
-      nominal.clear();
-      keterangan.clear();
     });
   }
 
@@ -169,34 +156,37 @@ class inputAdminState extends State<inputAdmin> {
       status = 'Pemasukan';
       selectedIndex = 1;
       kategori.clear();
-      nominal.clear();
-      keterangan.clear();
     });
   }
 
-  void _showModal(List<Tipe> data) {
+  void _showModalBottomSheet(List<Tipe> data) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return Container(
           padding: EdgeInsets.all(16.0),
-          height: 300,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: data.length,
-            itemBuilder: (BuildContext context, int index) {
-              Tipe transaction = data[index];
-              return ListTile(
-                title: Text(transaction.title),
-                onTap: () {
-                  setState(() {
-                    selectedOption = transaction.title;
-                    kategori.text = transaction.title;
-                  });
-                  Navigator.pop(context);
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: data.length,
+                itemBuilder: (BuildContext context, int index) {
+                  Tipe transaction = data[index];
+                  return ListTile(
+                    title: Text(transaction.title),
+                    onTap: () {
+                      setState(() {
+                        selectedOption = transaction.title;
+                        kategori.text = transaction.title;
+                      });
+                      Navigator.pop(context);
+                    },
+                  );
                 },
-              );
-            },
+              ),
+            ],
           ),
         );
       },
@@ -206,25 +196,22 @@ class inputAdminState extends State<inputAdmin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Tambah Transaksi'),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+      appBar: AppBar(
+        title: Text('Update Data Transaksi'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete),
             onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => adminPage(id_user: 11),
-                ),
-                (route) => false,
-              );
+            // Aksi yang ingin dilakukan saat ikon ditekan
             },
           ),
-        ),
-        body: Container(
-          padding: EdgeInsets.fromLTRB(35, 20, 20, 20),
-          child: Column(
-            children: <Widget>[
+        ],
+      ),
+      body: Container(
+        padding:
+            EdgeInsets.only(top: 35, right: 20, left: 20, bottom: 20),
+        child: Column(
+          children: <Widget>[
             // TOMBOL PEMASUKAN DAN PENGELUARAN
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -255,10 +242,10 @@ class inputAdminState extends State<inputAdmin> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: selectedIndex == 1 ? Colors.green : Colors.grey,
+                      backgroundColor:
+                          selectedIndex == 1 ? Colors.green : Colors.grey,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.zero
-                      ),
+                          borderRadius: BorderRadius.zero),
                     ),
                     child: Text(
                       "PEMASUKAN",
@@ -275,72 +262,62 @@ class inputAdminState extends State<inputAdmin> {
                     },
                   ),
                 ),
-                
               ],
             ),
 
             SizedBox(height: 10.0),
             if (status == 'Pengeluaran')
-            TextField(
-              controller: kategori, 
-              decoration: InputDecoration(
-                icon: Icon(Icons.category_outlined),
-                labelText: "Kategori $status",
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    
-                    // Lakukan sesuatu saat tombol ikon ditekan
-                    _showModal(pengeluaranData);
-                    // String text = kategori.text;
-                    // print('Nilai yang dimasukkan: $text');
-                  },
-                  icon: Icon(Icons.add),
+              TextField(
+                controller: kategori,
+                decoration: InputDecoration(
+                  icon: Icon(Icons.category_outlined),
+                  labelText: "Kategori $status",
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      // Lakukan sesuatu saat tombol ikon ditekan
+                      _showModalBottomSheet(pengeluaranData);
+                    },
+                    icon: Icon(Icons.add),
+                  ),
                 ),
               ),
-            ),
             if (status == 'Pemasukan')
-            TextField(
-              controller: kategori, 
-              decoration: InputDecoration(
-                icon: Icon(Icons.category_outlined),
-                labelText: "Kategori $status",
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    
-                    // Lakukan sesuatu saat tombol ikon ditekan
-                    _showModal(pemasukanData);
-                    // String text = kategori.text;
-                    // print('Nilai yang dimasukkan: $text');
-                  },
-                  icon: Icon(Icons.add),
+              TextField(
+                controller: kategori,
+                decoration: InputDecoration(
+                  icon: Icon(Icons.category_outlined),
+                  labelText: "Kategori $status",
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      // Lakukan sesuatu saat tombol ikon ditekan
+                      _showModalBottomSheet(pemasukanData);
+                    },
+                    icon: Icon(Icons.add),
+                  ),
                 ),
               ),
-            ),
-            
+
             SizedBox(height: 10.0),
             // TANGGAL
             TextField(
               controller: TextEditingController(
-                text: "${DateFormat ('EEEE, dd MMMM yyyy', 'id_ID'). format(selectedDate)}"
-              ),
+                  text:
+                      "${DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(selectedDate)}"),
               decoration: InputDecoration(
-                icon: Icon(
-                  Icons.calendar_month_sharp
-                ), 
-                labelText: "Tanggal",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0))
-                )
-              ),
+                  icon: Icon(Icons.calendar_month_sharp),
+                  labelText: "Tanggal",
+                  border: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.all(Radius.circular(5.0)))),
               readOnly: true,
               onTap: () {
                 showDatePicker(
-                  context: context, 
-                  initialDate: selectedDate, 
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2101)
-                ).then((value) {
-                  if(value != null) {
+                        context: context,
+                        initialDate: selectedDate,
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2101))
+                    .then((value) {
+                  if (value != null) {
                     setState(() {
                       selectedDate = value;
                       print(selectedDate);
@@ -349,61 +326,55 @@ class inputAdminState extends State<inputAdmin> {
                 });
               },
             ),
-                       
+
             SizedBox(height: 10.0),
             // NOMINAL
             TextField(
               controller: nominal,
               onChanged: formatNominal,
               decoration: InputDecoration(
-                icon: Icon(Icons.attach_money),
-                labelText: "Nominal",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0))
-                )
-              ),
+                  icon: Icon(Icons.attach_money),
+                  labelText: "Nominal",
+                  border: OutlineInputBorder(
+                      borderRadius:
+                          BorderRadius.all(Radius.circular(5.0)))),
               keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly
-              ], 
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
-            
+
             SizedBox(height: 10.0),
             // KETERANGAN
             TextField(
-              controller: keterangan, //editing controller of this TextField
+              controller: keterangan,
               decoration: InputDecoration(
-                  icon: Icon(Icons.edit_note_rounded), //icon of text field
-                  labelText: "Keterangan", //label text of field
+                  icon: Icon(Icons.edit_note_rounded),
+                  labelText: "Keterangan",
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0))
-                  )
-              ),
+                      borderRadius:
+                          BorderRadius.all(Radius.circular(5.0)))),
             ),
 
             // SizedBox(
-            //   height: 20.0
+            //   height: 20.0,
             // ),
             // Row(
             //   children: <Widget>[
             //     Radio(
-            //       value: 0,
-            //       groupValue: this.selected,
-            //       onChanged: (int? value) {
-            //         onChanged(value);
-            //       }
-            //     ),
+            //         value: 0,
+            //         groupValue: this.selected,
+            //         onChanged: (int? value) {
+            //           onChanged(value);
+            //         }),
             //     Container(
             //       width: 8.0,
             //     ),
             //     Text('Cash'),
             //     Radio(
-            //       value: 1,
-            //       groupValue: this.selected,
-            //       onChanged: (int? value) {
-            //         onChanged(value);
-            //       }
-            //     ),
+            //         value: 1,
+            //         groupValue: this.selected,
+            //         onChanged: (int? value) {
+            //           onChanged(value);
+            //         }),
             //     Container(
             //       width: 8.0,
             //     ),
@@ -414,28 +385,26 @@ class inputAdminState extends State<inputAdmin> {
             SizedBox(height: 25.0),
             // TOMBOL SIMPAN
             Row(
-              mainAxisAlignment: MainAxisAlignment.center, 
-              children: <Widget>[
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.only(top:20),
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Expanded(
                     child: ElevatedButton(
-                      child: Text(
-                        "Tambah",
-                        style: TextStyle(fontSize: 15),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue
                       ),
                       onPressed: () {
-                        print('Id User : ${widget.id_user}');
-                        tambahTransaksi();
+                        updateTransaksi;
                       },
+                      child: Text(
+                        "SIMPAN",
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
-                  ) 
-                )
-              ]
-            ),
-          ]
+                  ),
+                ])
+          ],
         ),
-      )
+      ),
     );
   }
 }

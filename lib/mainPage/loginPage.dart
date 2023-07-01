@@ -53,14 +53,12 @@ Future<void> _login() async {
 
   Widget _buildPageContent () {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       child: Container(
         child: ListView(
           children: <Widget>[
             SizedBox(
               height: 50,
-            ),
-            SizedBox(
               child: Center(
                 child: Text(
                   'APKEU - UMKM',
@@ -115,9 +113,7 @@ Future<void> _login() async {
                           _togglePassword();
                         },
                         child: Icon(
-                          _isHidePassword
-                              ? Icons.visibility_off
-                              : Icons.visibility,
+                          _isHidePassword ? Icons.visibility_off : Icons.visibility,
                           color: _isHidePassword ? Colors.grey : Colors.blue,
                         ),
                       ),

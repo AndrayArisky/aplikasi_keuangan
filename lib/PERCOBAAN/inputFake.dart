@@ -5,42 +5,20 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
-class Tipe{
-  final String title;
-  final String type;
 
-  Tipe({
-    required this.title, 
-    required this.type
-  });
-}
 
-class inputAdmin extends StatefulWidget {
+class inputFake extends StatefulWidget {
   final id_user;
-  inputAdmin({required this.id_user});
+  inputFake({required this.id_user});
 
   @override
-  inputAdminState createState() => inputAdminState();
+  inputFakeState createState() => inputFakeState();
 }
 
-class inputAdminState extends State<inputAdmin> {
-
-  List<Tipe> pemasukanData = [
-    Tipe(title: 'Pendapatan Jasa', type: 'Pemasukan'),
-    Tipe(title: 'Pendapatan Giveaway', type: 'Pemasukan'),
-    Tipe(title: 'Dapat Dari Baim Wong', type: 'Pemasukan'),
-  ];
-  List<Tipe> pengeluaranData = [
-    Tipe(title: 'Harga Pokok Penjualan', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Perlengkapan/ATK', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Gaji Karyawan', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Sewa', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Listrik', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Air', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Lain-lain', type: 'Pengeluaran'),
-  ];
+class inputFakeState extends State<inputFake> {
+  bool isLoading = true;
+  List<dynamic> data = [];
   
-
   // DI CHATGPT BUAT MUNCUL DATA DI SHOWMODALBUTTON
 
   int? selected = -1;
@@ -54,6 +32,12 @@ class inputAdminState extends State<inputAdmin> {
   final kategori = TextEditingController();
   final nominal = TextEditingController();
   final keterangan = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
 
   // FUNGSI TOMBOL SIMPAN
   void tambahTransaksi() async {
@@ -159,8 +143,6 @@ class inputAdminState extends State<inputAdmin> {
       status = 'Pengeluaran';
       selectedIndex = 2;
       kategori.clear();
-      nominal.clear();
-      keterangan.clear();
     });
   }
 
@@ -169,29 +151,44 @@ class inputAdminState extends State<inputAdmin> {
       status = 'Pemasukan';
       selectedIndex = 1;
       kategori.clear();
-      nominal.clear();
-      keterangan.clear();
     });
   }
 
-  void _showModal(List<Tipe> data) {
+  Future<void> fetchData() async {
+    // Ganti URL_API dengan URL dari API database Anda
+    final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getdata.php'));
+    
+    if (response.statusCode == 200) {
+      setState(() {
+        data = json.decode(response.body);
+        isLoading = false;
+      });
+    } else {
+      throw Exception('Failed to load data from API');
+    }
+  }
+
+  void _showModal(String tipe) {
+    List<dynamic> filteredData =
+        data.where((item) => item['tipe'] == tipe).toList();
+
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return Container(
-          padding: EdgeInsets.all(16.0),
+          // padding: EdgeInsets.all(16.0),
           height: 300,
           child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: data.length,
+            //shrinkWrap: true,
+            itemCount: filteredData.length,
             itemBuilder: (BuildContext context, int index) {
-              Tipe transaction = data[index];
+              final item = filteredData[index];
               return ListTile(
-                title: Text(transaction.title),
+                title: Text(item['nm_akun']),
                 onTap: () {
                   setState(() {
-                    selectedOption = transaction.title;
-                    kategori.text = transaction.title;
+                    selectedOption = item['nm_akun'];
+                    kategori.text = item['nm_akun'];
                   });
                   Navigator.pop(context);
                 },
@@ -222,7 +219,7 @@ class inputAdminState extends State<inputAdmin> {
           ),
         ),
         body: Container(
-          padding: EdgeInsets.fromLTRB(35, 20, 20, 20),
+          padding: EdgeInsets.only(top: 35, right: 20, left: 20, bottom: 20),
           child: Column(
             children: <Widget>[
             // TOMBOL PEMASUKAN DAN PENGELUARAN
@@ -290,7 +287,7 @@ class inputAdminState extends State<inputAdmin> {
                   onPressed: () {
                     
                     // Lakukan sesuatu saat tombol ikon ditekan
-                    _showModal(pengeluaranData);
+                    _showModal('pm');
                     // String text = kategori.text;
                     // print('Nilai yang dimasukkan: $text');
                   },
@@ -308,7 +305,7 @@ class inputAdminState extends State<inputAdmin> {
                   onPressed: () {
                     
                     // Lakukan sesuatu saat tombol ikon ditekan
-                    _showModal(pemasukanData);
+                    _showModal('pemasukanData');
                     // String text = kategori.text;
                     // print('Nilai yang dimasukkan: $text');
                   },
@@ -376,40 +373,41 @@ class inputAdminState extends State<inputAdmin> {
                   icon: Icon(Icons.edit_note_rounded), //icon of text field
                   labelText: "Keterangan", //label text of field
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0))
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)
+                    )
                   )
               ),
             ),
 
-            // SizedBox(
-            //   height: 20.0
-            // ),
-            // Row(
-            //   children: <Widget>[
-            //     Radio(
-            //       value: 0,
-            //       groupValue: this.selected,
-            //       onChanged: (int? value) {
-            //         onChanged(value);
-            //       }
-            //     ),
-            //     Container(
-            //       width: 8.0,
-            //     ),
-            //     Text('Cash'),
-            //     Radio(
-            //       value: 1,
-            //       groupValue: this.selected,
-            //       onChanged: (int? value) {
-            //         onChanged(value);
-            //       }
-            //     ),
-            //     Container(
-            //       width: 8.0,
-            //     ),
-            //     Text('Non-cash')
-            //   ],
-            // ),
+            SizedBox(
+              height: 20.0
+            ),
+            Row(
+              children: <Widget>[
+                Radio(
+                  value: 0,
+                  groupValue: this.selected,
+                  onChanged: (int? value) {
+                    onChanged(value);
+                  }
+                ),
+                Container(
+                  width: 8.0,
+                ),
+                Text('Cash'),
+                Radio(
+                  value: 1,
+                  groupValue: this.selected,
+                  onChanged: (int? value) {
+                    onChanged(value);
+                  }
+                ),
+                Container(
+                  width: 8.0,
+                ),
+                Text('Non-cash')
+              ],
+            ),
 
             SizedBox(height: 25.0),
             // TOMBOL SIMPAN

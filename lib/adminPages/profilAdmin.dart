@@ -1,18 +1,32 @@
-import 'package:aplikasi_keuangan/mainPage/loginPage.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-class profilKaryawan extends StatefulWidget {
+class profilAdmin extends StatefulWidget {
 
   @override
-  _profilKaryawanState createState() => _profilKaryawanState();
+  _profilAdminState createState() => _profilAdminState();
 }
 
-class _profilKaryawanState extends State<profilKaryawan>{
+class _profilAdminState extends State<profilAdmin>{
+  List<dynamic> Data = [];
 
-  Future<void> clearLoginData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getprofil.php'));
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      setState(() {
+        Data = jsonData;
+      });
+    } else {
+      throw Exception('Gagal mengambil data!');
+    }
   }
 
   @override
@@ -28,7 +42,7 @@ class _profilKaryawanState extends State<profilKaryawan>{
               subtitle: "Alamat Usaha",
             ),
             SizedBox(height: 10,),
-            karyawanInfo(),
+            adminInfo(),
           ],
         ),
       ),
@@ -36,7 +50,7 @@ class _profilKaryawanState extends State<profilKaryawan>{
   }
 }
 
-class karyawanInfo extends StatelessWidget {
+class adminInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -45,7 +59,7 @@ class karyawanInfo extends StatelessWidget {
         children: <Widget>[
           ListTile(
             title: Text(
-              'Informasi Karyawan',
+              'Informasi Admin',
               style: TextStyle(
                 fontSize: 16,
               ),
@@ -64,6 +78,7 @@ class karyawanInfo extends StatelessWidget {
               ],
             )
           ),
+
           Card(
             child: Container(
               alignment: Alignment.topLeft,
@@ -93,6 +108,23 @@ class karyawanInfo extends StatelessWidget {
                             leading: Icon(Icons.phone),
                             title: Text("No. HP/Telp"),
                             subtitle: Text("Andray"),
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.business_rounded),
+                            title: Text("Bidang Usaha"),
+                            subtitle: Text("Andray"
+                            ),
+                          ),
+                          ListTile(
+                            leading: Icon(
+                              Icons.format_list_numbered_sharp
+                            ),
+                            title: Text(
+                              "NPWP Usaha"
+                            ),
+                            subtitle: Text(
+                              "Andray"
+                            ),
                           )
                         ]
                       )
@@ -101,30 +133,7 @@ class karyawanInfo extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-          SizedBox(height: 30,),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(4, 15, 4, 15),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue
-                      ),
-                      child: Text('Keluar'),
-                      onPressed: () {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (context) => loginPage()),
-                          (Route<dynamic> route) => false,
-                        );
-                      }, 
-                    ),
-                  )
-                )
-              ],
-            ),
+          )
         ],
       ),
     );
@@ -148,17 +157,6 @@ class ProfilHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        if (action != null)
-        Container(
-          width: double.infinity,
-          height: 100,
-          padding: EdgeInsets.only(bottom: 0, right: 0),
-          alignment: Alignment.bottomRight,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: action!,
-          ),
-        ),
         Container(
           width: double.infinity,
           margin: EdgeInsets.only(top: 50),
@@ -183,4 +181,7 @@ class ProfilHeader extends StatelessWidget {
       ],
     );
   }
+
+
+
 }
