@@ -12,6 +12,8 @@ class loginPage extends StatefulWidget {
 class _loginPageState extends State<loginPage> {
 
   bool _isHidePassword = true;
+  TextEditingController username = new TextEditingController();
+  TextEditingController password = new TextEditingController();
   
   void _togglePassword() {
     setState(() {
@@ -19,41 +21,70 @@ class _loginPageState extends State<loginPage> {
     });
   }
 
-  TextEditingController username = new TextEditingController();
-  TextEditingController password = new TextEditingController();
+  
+  void clear() {
+    setState(() {
+      username.clear();
+      password.clear();
+    });
+  }
 
-Future<void> _login() async {
-  final result = await http.post(
-    Uri.parse('https://apkeu2023.000webhostapp.com/login.php'),
-    body: {
-      "username": username.text,
-      "password": password.text,
-    },
-  );
- 
-  final datauser = json.decode(result.body);
- 
-  if (datauser.length == 0) {
-    setState(() {
-      print('Maaf, silakan Cek Username dan Password Anda');
-    });
-  } else {
-    if (datauser[0]['level'] == 'admin') {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => adminPage(id_user: 11,)));
-      print('Login Berhasil, Selamat Datang di Halaman Admin');
-    } else if (datauser[0]['level'] == 'karyawan') {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => karyawanPage(id_user: 22,)));
-      print('Login Berhasil, Selamat Datang di Halaman Karyawan');
-    }
-    setState(() {
-    // username = datauser[0]['username'];
-    });
- }
-} 
+  Future<void> login() async {
+    final result = await http.post(
+      Uri.parse('https://apkeu2023.000webhostapp.com/login.php'),
+      body: {
+        "nama": username.text,
+        "password": password.text,
+      },
+    );
+  
+    final datauser = json.decode(result.body);
+  
+    if (datauser.length == 0) {
+      setState(() {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Gagal login"),
+              content:Text("Username & Password Salah!"),
+              actions: <Widget>[
+                ElevatedButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            );
+          },
+        );
+      });
+    } else {
+      if (datauser[0]['level'] == 'admin') {
+        Navigator.pushReplacement(
+          context, MaterialPageRoute(
+            builder: (context) => adminPage(level: 'admin')
+          )
+        );
+        print('Login Berhasil, Selamat Datang di Halaman Admin');
+      } else if (datauser[0]['level'] == 'karyawan') {
+        Navigator.pushReplacement(
+          context, MaterialPageRoute(
+            builder: (context) => karyawanPage(level: 'karyawan')
+          )
+        );
+        print('Login Berhasil, Selamat Datang di Halaman Karyawan');
+      }
+      setState(() {
+      // username = datauser[0]['username'];
+      });
+  }
+  } 
 
   Widget _buildPageContent () {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.fromLTRB(15, 100, 15, 25),
       child: Container(
         child: ListView(
           children: <Widget>[
@@ -70,7 +101,7 @@ Future<void> _login() async {
                 ),
               ),
             ),
-            SizedBox(height: 50),
+            SizedBox(height: 30),
             //USERNAME
             ListTile(
               title: TextField(
@@ -121,12 +152,13 @@ Future<void> _login() async {
                 ),
               ),
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 50),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
+                  child: Container(
+                    padding: EdgeInsets.fromLTRB(15, 25, 15, 25),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue
@@ -139,24 +171,8 @@ Future<void> _login() async {
                         ),
                       ),
                       onPressed: () {
-                        /*
-                        if (username.value.text == 'admin' && password.value.text == 'admin') {
-                          Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) {
-                            return menu();
-                          }));
-                          // _sendDataToSecondScreen(context);
-                        } else if (username.value.text == 'karyawan' && password.value.text == 'karyawan') {
-                          Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) {
-                            return Karyawan_Page();
-                          }));
-                          // _sendDataToSecondScreen(context);
-                        } else {
-                          error(context, "Username dan password salah!");
-                        }
-                        */
-                        _login();
+                        login();
+                        clear();
                       }, 
                     ),
                   )
@@ -200,10 +216,8 @@ Future<void> _login() async {
             // )
           ],
         ),
-        
       ),
     );
-    
   }
 
   @override
@@ -211,21 +225,5 @@ Future<void> _login() async {
     return Scaffold(
       body: _buildPageContent(),
     );
-  }
- 
+  } 
 }
-
-void error(BuildContext context, String error) {
-    final scaffold = ScaffoldMessenger.of(context);
-    scaffold.showSnackBar(
-      SnackBar(
-        content: Text(error),
-        action: SnackBarAction(
-          label: 'OK', 
-          onPressed: scaffold.hideCurrentSnackBar
-        ),
-      ),
-    );
-  }
-
-// source code flutter untuk menghitung sisa kas dari pemasukan dan pengeluaran per hari

@@ -6,15 +6,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 
 class karyawanPage extends StatefulWidget {
-  final dynamic id_user;
-  karyawanPage({super.key, required this.id_user}); 
+  final dynamic level;
+  karyawanPage({super.key, required this.level}); 
 
   @override
   karyawanPageState createState() => karyawanPageState();
 }
 
 class karyawanPageState extends State<karyawanPage>{
-  //late dynamic id_user;
+  //late dynamic level;
   int _selectedIndex = 0;
   var selectedPage =  [
     transaksiKaryawan(),
@@ -30,7 +30,7 @@ class karyawanPageState extends State<karyawanPage>{
   @override
   void initState() {
     super.initState();
-    var id_user = widget.id_user;
+    var level = widget.level;
   }
 
   @override

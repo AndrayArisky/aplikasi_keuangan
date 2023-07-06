@@ -1,14 +1,41 @@
 import 'package:aplikasi_keuangan/mainPage/loginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class profilKaryawan extends StatefulWidget {
-
   @override
   _profilKaryawanState createState() => _profilKaryawanState();
 }
 
 class _profilKaryawanState extends State<profilKaryawan>{
+  //List<dynamic> Data = [];
+  dynamic karyawan;
+  String level = 'karyawan';
+  String id_user = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String loginData = prefs.getString('loginData') ?? '';
+    dynamic userData = json.decode(loginData);
+    id_user = userData['id_user'];
+    final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getTransaksi.php?id_user=$id_user'));
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      setState(() {
+        karyawan = jsonData.isNotEmpty ? jsonData[0] : null;
+      });
+    } else {
+      throw Exception('Gagal mengambil data!');
+    }
+  }
 
   Future<void> clearLoginData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -17,18 +44,44 @@ class _profilKaryawanState extends State<profilKaryawan>{
 
   @override
   Widget build(BuildContext context) {
+    final String title = karyawan != null ? karyawan['usaha'] : '';
+    final String subtitle = karyawan != null ? karyawan['alamat'] : '';
+    
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      extendBody: true,
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            ProfilHeader(
-              title: "Nama Usaha",
-              subtitle: "Alamat Usaha",
+    extendBodyBehindAppBar: true,
+    extendBody: true,
+    body: SingleChildScrollView(
+      child: Column(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.all(20),
+            child: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+            ),
             ),
             SizedBox(height: 10,),
-            karyawanInfo(),
+            if (level == 'karyawan') ...[
+            karyawanInfo(karyawan: karyawan),
+            ]
           ],
         ),
       ),
@@ -37,6 +90,9 @@ class _profilKaryawanState extends State<profilKaryawan>{
 }
 
 class karyawanInfo extends StatelessWidget {
+  final dynamic karyawan;
+  const karyawanInfo({super.key, required this.karyawan});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -81,18 +137,18 @@ class karyawanInfo extends StatelessWidget {
                               vertical: 4
                             ),
                             leading: Icon(Icons.person),
-                            title: Text("Nama Karyawan"),
-                            subtitle: Text("Arisky"),
+                            title: Text("Nama Admin"),
+                            subtitle: Text(karyawan != null ? karyawan['nama'] : ''),
                           ),
                           ListTile(
                             leading: Icon(Icons.mail_outlined),
                             title: Text("Email"),
-                            subtitle: Text("Andray"),
+                            subtitle: Text(karyawan != null ? karyawan['email'] : ''),
                           ),
                           ListTile(
                             leading: Icon(Icons.phone),
                             title: Text("No. HP/Telp"),
-                            subtitle: Text("Andray"),
+                            subtitle: Text(karyawan != null ? karyawan['nohp'] : ''),
                           )
                         ]
                       )
@@ -130,57 +186,4 @@ class karyawanInfo extends StatelessWidget {
     );
   }
 
-}
-
-class ProfilHeader extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final List<Widget>? action;
-
-  const ProfilHeader({
-    super.key, 
-    required this.title, 
-    required this.subtitle, 
-    this.action
-  });
-  
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        if (action != null)
-        Container(
-          width: double.infinity,
-          height: 100,
-          padding: EdgeInsets.only(bottom: 0, right: 0),
-          alignment: Alignment.bottomRight,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: action!,
-          ),
-        ),
-        Container(
-          width: double.infinity,
-          margin: EdgeInsets.only(top: 50),
-          child: Column(
-            children: <Widget>[
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              if (subtitle != null) ...[
-                SizedBox(
-                  height: 5.0,
-                ),
-                Text(
-                  subtitle,
-                  style: Theme.of(context).textTheme.titleSmall,
-                )
-              ]
-            ],
-          ),
-        )
-      ],
-    );
-  }
 }

@@ -16,8 +16,8 @@ class Tipe{
 }
 
 class inputAdmin extends StatefulWidget {
-  final id_user;
-  inputAdmin({required this.id_user});
+  final level;
+  inputAdmin({required this.level});
 
   @override
   inputAdminState createState() => inputAdminState();
@@ -40,7 +40,6 @@ class inputAdminState extends State<inputAdmin> {
     Tipe(title: 'Beban Lain-lain', type: 'Pengeluaran'),
   ];
   
-
   // DI CHATGPT BUAT MUNCUL DATA DI SHOWMODALBUTTON
 
   int? selected = -1;
@@ -48,7 +47,7 @@ class inputAdminState extends State<inputAdmin> {
   String status = 'Pengeluaran';
   DateTime selectedDate = DateTime.now();
   String _formatNominal = '';
-  late dynamic id_user;
+  String id_user = '1';
   String? selectedOption;
 
   final kategori = TextEditingController();
@@ -59,7 +58,7 @@ class inputAdminState extends State<inputAdmin> {
   void tambahTransaksi() async {
     var url = Uri.parse('http://apkeu2023.000webhostapp.com/inputdata.php');
     var body = {
-      'id_user': widget.id_user.toString(),
+      'id_user': id_user,
       'kategori': kategori.text,
       'tgl_transaksi': selectedDate.toString(),
       'nominal': nominal.text,
@@ -70,7 +69,7 @@ class inputAdminState extends State<inputAdmin> {
     var response = await http.post(url, body: body);
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
-    print('ID USER : ${widget.id_user}, selectedDate $selectedDate');
+    //print('ID USER : ${widget.id_user}, selectedDate $selectedDate');
 
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
@@ -89,11 +88,12 @@ class inputAdminState extends State<inputAdmin> {
                   child: Text("OK"),
                   onPressed: () {
                     //Navigator.of(context).pop();
-                    Navigator.pushReplacement(
+                    Navigator.pushAndRemoveUntil(
                       context, 
                       MaterialPageRoute(
-                        builder: (context) => adminPage(id_user: 11)
-                      )
+                        builder: (context) => adminPage(level: 'admin')
+                      ),
+                      (route) => false
                     );
                   },
                 )
@@ -214,7 +214,7 @@ class inputAdminState extends State<inputAdmin> {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => adminPage(id_user: 11),
+                  builder: (context) => adminPage(level: 'admin'),
                 ),
                 (route) => false,
               );
@@ -425,7 +425,7 @@ class inputAdminState extends State<inputAdmin> {
                         style: TextStyle(fontSize: 15),
                       ),
                       onPressed: () {
-                        print('Id User : ${widget.id_user}');
+                        print('Id User : ${widget.level}');
                         tambahTransaksi();
                       },
                     ),

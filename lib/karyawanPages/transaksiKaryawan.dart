@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:aplikasi_keuangan/adminPages/adminPage.dart';
-import 'package:aplikasi_keuangan/adminPages/inputAdmin.dart';
 import 'package:aplikasi_keuangan/karyawanPages/inputKaryawan.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -367,7 +366,7 @@ class _transaksiKaryawanState extends State<transaksiKaryawan> {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => inputKaryawan(id_user: 22,))
+                  MaterialPageRoute(builder: (context) => inputKaryawan(level: 'karyawan'))
                 );
               }
           ),

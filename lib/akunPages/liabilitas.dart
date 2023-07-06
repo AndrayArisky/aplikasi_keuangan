@@ -21,17 +21,10 @@ class liabilitasState extends State<liabilitas> {
     final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getdata.php'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
-      // List<dynamic> data = jsonDecode(response.body);
-      
+      final akun = jsonData.where((data) => data['neraca'] == 'Liabilitas (Kewajiban)').toList();
       setState(() {
-        Data = jsonData;
+        Data = akun;
       });
-      
-      // Lakukan filter atau manipulasi data sesuai kebutuhan Anda
-    //List<dynamic> filteredData = data.where((getdata) => getdata['neraca'] == 'Aset').toList();
-    
-    // Mengubah filteredData menjadi List<Item>
-    //List<Items> itemList = filteredData.map((item) => Items.fromJson(item)).toList();
     } else {
       throw Exception('Gagal mengambil data!');
     }
@@ -47,14 +40,14 @@ class liabilitasState extends State<liabilitas> {
           children: [
             DataTable(
               columns: [
-                DataColumn(label: Text('Kode')),
+                //DataColumn(label: Text('Kode')),
                 DataColumn(label: Text('Nama Akun')),
                 DataColumn(label: Text('Grup'))
               ], 
               rows: Data.map(
                 (getdata) => DataRow(
                   cells: [
-                    DataCell(Text(getdata['kode_akun'].toString())),
+                    //DataCell(Text(getdata['kode_akun'].toString())),
                     DataCell(Text(getdata['nm_akun'].toString())),
                     DataCell(Text(getdata['grup'].toString())),
                   ]

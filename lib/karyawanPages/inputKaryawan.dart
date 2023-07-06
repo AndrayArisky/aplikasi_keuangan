@@ -16,8 +16,8 @@ class Tipe{
 }
 
 class inputKaryawan extends StatefulWidget {
-  final id_user;
-  inputKaryawan({required this.id_user});
+  final level;
+  inputKaryawan({required this.level});
 
   @override
   inputKaryawanState createState() => inputKaryawanState();
@@ -45,7 +45,7 @@ class inputKaryawanState extends State<inputKaryawan> {
   String status = 'Pengeluaran';
   DateTime selectedDate = DateTime.now();
   String _formatNominal = '';
-  late dynamic id_user;
+  String id_user = '2';
   String? selectedOption;
 
   final kategori = TextEditingController();
@@ -56,7 +56,7 @@ class inputKaryawanState extends State<inputKaryawan> {
   void tambahTransaksi() async {
     var url = Uri.parse('http://apkeu2023.000webhostapp.com/inputdata.php');
     var body = {
-      'id_user': widget.id_user.toString(),
+      'id_user': id_user,
       'kategori': kategori.text,
       'tgl_transaksi': selectedDate.toString(),
       'nominal': nominal.text,
@@ -67,7 +67,7 @@ class inputKaryawanState extends State<inputKaryawan> {
     var response = await http.post(url, body: body);
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
-    print('ID USER : ${widget.id_user}, selectedDate $selectedDate');
+    print('ID USER : ${widget.level}, selectedDate $selectedDate');
 
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
@@ -86,11 +86,12 @@ class inputKaryawanState extends State<inputKaryawan> {
                   child: Text("OK"),
                   onPressed: () {
                     //Navigator.of(context).pop();
-                    Navigator.pushReplacement(
+                    Navigator.pushAndRemoveUntil(
                       context, 
                       MaterialPageRoute(
-                        builder: (context) => adminPage(id_user: 22)
-                      )
+                        builder: (context) => adminPage(level: 'karyawan')
+                      ),
+                      (route) => false
                     );
                   },
                 )
@@ -104,8 +105,8 @@ class inputKaryawanState extends State<inputKaryawan> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text("Gagal menyimpan data!"),
-              content:
-                  Text("Pastikan data yang anda input sudah benar!"),
+              // content:
+              //     Text("Pastikan data yang anda input sudah benar!"),
               // content: Text(result["message"]),
               actions: <Widget>[
                 ElevatedButton(
@@ -417,7 +418,7 @@ class inputKaryawanState extends State<inputKaryawan> {
                         style: TextStyle(fontSize: 15),
                       ),
                       onPressed: () {
-                        print('Id User : ${widget.id_user}');
+                        print('Id User : ${widget.level}');
                         tambahTransaksi();
                       },
                     ),

@@ -6,8 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 class tambahAnggota extends StatefulWidget {
-  final id_user;
-  const tambahAnggota({super.key, required this.id_user});
+  final level;
+  const tambahAnggota({super.key, required this.level});
 
   @override
   _tambahAnggotaState createState() => _tambahAnggotaState();
@@ -16,7 +16,7 @@ class tambahAnggota extends StatefulWidget {
 class _tambahAnggotaState extends State<tambahAnggota> {
 
   bool _isHidePassword = true;
-  late dynamic id_user;
+  //late dynamic level;
   String usaha = "Tidak Ada Nama Usaha";
   String level = "karyawan";
 
@@ -29,7 +29,6 @@ class _tambahAnggotaState extends State<tambahAnggota> {
     void resetData() {
     setState(() {
       nama.clear();
-      username.clear();
       email.clear();
       nohp.clear();
       alamat.clear();
@@ -38,7 +37,6 @@ class _tambahAnggotaState extends State<tambahAnggota> {
   }
   
   final nama = new TextEditingController();
-  final username = new TextEditingController();
   final email = new TextEditingController();
   final nohp = new TextEditingController();
   final alamat = new TextEditingController();
@@ -48,21 +46,20 @@ class _tambahAnggotaState extends State<tambahAnggota> {
   void tambahAnggota() async {
     var url = Uri.parse('http://apkeu2023.000webhostapp.com/inputAnggota.php');
     var body = {
-      'id_user': widget.id_user.toString(),
+      //'id_user': widget.id_user.toString(),
       'nama': nama.text,
-      'username' : username.text,
       'email': email.text,
       'nohp': nohp.text,
       'usaha': usaha,
       'alamat' : alamat.text,
       'password': password.text,
-      'level' : level,
+      'level' : level
     };
 
     var response = await http.post(url, body: body);
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
-    print('ID USER : ${widget.id_user}');
+    print('ID USER : ${widget.level}');
     
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
@@ -72,20 +69,22 @@ class _tambahAnggotaState extends State<tambahAnggota> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text("Berhasil menambah anggota baru!"),
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-              ),
               actions: <Widget>[
                 ElevatedButton(
                   child: Text("OK"),
                   onPressed: () {
                     //Navigator.of(context).pop();
-                    Navigator.pushReplacement(
-                      context, 
+                    // Navigator.pushReplacement(
+                    //   context, 
+                    //   MaterialPageRoute(
+                    //     builder: (context) => adminPage(level: 'admin')
+                    //   )
+                    // );
+                    Navigator.push(
+                      context,
                       MaterialPageRoute(
-                        builder: (context) => adminPage(id_user: 11)
-                      )
+                        builder: (context) => adminPage(level: 'admin'),
+                      ),
                     );
                   },
                 )
@@ -99,8 +98,7 @@ class _tambahAnggotaState extends State<tambahAnggota> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text("Gagal menambah anggota!"),
-              content:
-                  Text("Pastikan data yang anda input sudah benar!"),
+              content: Text("Pastikan data yang anda input sudah benar!"),
               // content: Text(result["message"]),
               actions: <Widget>[
                 ElevatedButton(
@@ -150,23 +148,6 @@ class _tambahAnggotaState extends State<tambahAnggota> {
                   controller: nama,
                   decoration: InputDecoration(
                     labelText: 'Nama Anggota',
-                    hintStyle: TextStyle(
-                      color: Colors.blue
-                    ),
-                    border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0))
-                  )
-                  ),
-                ),
-              ),
-              ListTile(
-                title: TextField(
-                  style: TextStyle(
-                    color: Colors.blue
-                  ),
-                  controller: username,
-                  decoration: InputDecoration(
-                    labelText: 'Username Anggota',
                     hintStyle: TextStyle(
                       color: Colors.blue
                     ),
@@ -259,7 +240,7 @@ class _tambahAnggotaState extends State<tambahAnggota> {
                 children: <Widget>[
                   Expanded(
                     child: Container(
-                       padding: EdgeInsets.fromLTRB(15, 50, 15, 40),
+                      padding: EdgeInsets.fromLTRB(15, 50, 15, 40),
                       child: ElevatedButton(
                         child: Text(
                           'Tambah Anggota',

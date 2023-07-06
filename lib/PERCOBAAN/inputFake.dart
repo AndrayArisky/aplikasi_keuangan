@@ -5,45 +5,76 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
+class Tipe{
+  final String title;
+  final String type;
 
-
-class inputFake extends StatefulWidget {
-  final id_user;
-  inputFake({required this.id_user});
-
-  @override
-  inputFakeState createState() => inputFakeState();
+  Tipe({
+    required this.title, 
+    required this.type
+  });
 }
 
-class inputFakeState extends State<inputFake> {
-  bool isLoading = true;
-  List<dynamic> data = [];
-  
-  // DI CHATGPT BUAT MUNCUL DATA DI SHOWMODALBUTTON
+class EditTransaksi extends StatefulWidget {
+  final level;
+  EditTransaksi({required this.level});
 
+  @override
+  EditTransaksiState createState() => EditTransaksiState();
+}
+
+class EditTransaksiState extends State<EditTransaksi> {
   int? selected = -1;
   int selectedIndex = 2;
   String status = 'Pengeluaran';
   DateTime selectedDate = DateTime.now();
   String _formatNominal = '';
-  late dynamic id_user;
+  String id_user = '1';
   String? selectedOption;
+  List<Map<String, dynamic>> data = [];
+  String selectedTipe = '';
 
   final kategori = TextEditingController();
   final nominal = TextEditingController();
   final keterangan = TextEditingController();
 
-  @override
+    @override
   void initState() {
     super.initState();
     fetchData();
+  }
+
+  Future<void> fetchData() async {
+    final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getdata.php'));
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      setState(() {
+        data = List<Map<String, dynamic>>.from(jsonData);
+      });
+    } else {
+      throw Exception('Gagal mengambil data!');
+    }
+  }
+
+  List<Map<String, dynamic>> filterData(String tipe) {
+    if (tipe == 'pm' || tipe == 'pr') {
+      return data.where((item) => item['tipe'] == tipe).toList();
+    } else {
+      return data;
+    }
+  }
+
+  void selectTipe(String tipe) {
+    setState(() {
+      selectedTipe = tipe;
+    });
   }
 
   // FUNGSI TOMBOL SIMPAN
   void tambahTransaksi() async {
     var url = Uri.parse('http://apkeu2023.000webhostapp.com/inputdata.php');
     var body = {
-      'id_user': widget.id_user.toString(),
+      'id_user': id_user,
       'kategori': kategori.text,
       'tgl_transaksi': selectedDate.toString(),
       'nominal': nominal.text,
@@ -54,7 +85,7 @@ class inputFakeState extends State<inputFake> {
     var response = await http.post(url, body: body);
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
-    print('ID USER : ${widget.id_user}, selectedDate $selectedDate');
+    //print('ID USER : ${widget.id_user}, selectedDate $selectedDate');
 
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
@@ -73,11 +104,12 @@ class inputFakeState extends State<inputFake> {
                   child: Text("OK"),
                   onPressed: () {
                     //Navigator.of(context).pop();
-                    Navigator.pushReplacement(
+                    Navigator.pushAndRemoveUntil(
                       context, 
                       MaterialPageRoute(
-                        builder: (context) => adminPage(id_user: 11)
-                      )
+                        builder: (context) => adminPage(level: 'admin')
+                      ),
+                      (route) => false
                     );
                   },
                 )
@@ -143,6 +175,8 @@ class inputFakeState extends State<inputFake> {
       status = 'Pengeluaran';
       selectedIndex = 2;
       kategori.clear();
+      nominal.clear();
+      keterangan.clear();
     });
   }
 
@@ -151,44 +185,29 @@ class inputFakeState extends State<inputFake> {
       status = 'Pemasukan';
       selectedIndex = 1;
       kategori.clear();
+      nominal.clear();
+      keterangan.clear();
     });
   }
 
-  Future<void> fetchData() async {
-    // Ganti URL_API dengan URL dari API database Anda
-    final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getdata.php'));
-    
-    if (response.statusCode == 200) {
-      setState(() {
-        data = json.decode(response.body);
-        isLoading = false;
-      });
-    } else {
-      throw Exception('Failed to load data from API');
-    }
-  }
-
-  void _showModal(String tipe) {
-    List<dynamic> filteredData =
-        data.where((item) => item['tipe'] == tipe).toList();
-
+  void _showModal(List<Tipe> data) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return Container(
-          // padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0),
           height: 300,
           child: ListView.builder(
-            //shrinkWrap: true,
-            itemCount: filteredData.length,
+            shrinkWrap: true,
+            itemCount: data.length,
             itemBuilder: (BuildContext context, int index) {
-              final item = filteredData[index];
+              Tipe transaction = data[index];
               return ListTile(
-                title: Text(item['nm_akun']),
+                title: Text(transaction.title),
                 onTap: () {
                   setState(() {
-                    selectedOption = item['nm_akun'];
-                    kategori.text = item['nm_akun'];
+                    selectedOption = transaction.title;
+                    kategori.text = transaction.title;
                   });
                   Navigator.pop(context);
                 },
@@ -202,6 +221,7 @@ class inputFakeState extends State<inputFake> {
 
   @override
   Widget build(BuildContext context) {
+    List<Map<String, dynamic>> filteredData = filterData(selectedTipe);
     return Scaffold(
         appBar: AppBar(
           title: Text('Tambah Transaksi'),
@@ -211,7 +231,7 @@ class inputFakeState extends State<inputFake> {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => adminPage(id_user: 11),
+                  builder: (context) => adminPage(level: 'admin'),
                 ),
                 (route) => false,
               );
@@ -219,7 +239,7 @@ class inputFakeState extends State<inputFake> {
           ),
         ),
         body: Container(
-          padding: EdgeInsets.only(top: 35, right: 20, left: 20, bottom: 20),
+          padding: EdgeInsets.fromLTRB(35, 20, 20, 20),
           child: Column(
             children: <Widget>[
             // TOMBOL PEMASUKAN DAN PENGELUARAN
@@ -286,10 +306,9 @@ class inputFakeState extends State<inputFake> {
                 suffixIcon: IconButton(
                   onPressed: () {
                     
-                    // Lakukan sesuatu saat tombol ikon ditekan
-                    _showModal('pm');
-                    // String text = kategori.text;
-                    // print('Nilai yang dimasukkan: $text');
+                    _showModal(
+                      filterData('pr').cast<Tipe>()
+                    );
                   },
                   icon: Icon(Icons.add),
                 ),
@@ -302,12 +321,10 @@ class inputFakeState extends State<inputFake> {
                 icon: Icon(Icons.category_outlined),
                 labelText: "Kategori $status",
                 suffixIcon: IconButton(
-                  onPressed: () {
-                    
-                    // Lakukan sesuatu saat tombol ikon ditekan
-                    _showModal('pemasukanData');
-                    // String text = kategori.text;
-                    // print('Nilai yang dimasukkan: $text');
+                  onPressed: () {  
+                    _showModal(
+                      filterData('pm').cast<Tipe>()
+                    );
                   },
                   icon: Icon(Icons.add),
                 ),
@@ -373,42 +390,10 @@ class inputFakeState extends State<inputFake> {
                   icon: Icon(Icons.edit_note_rounded), //icon of text field
                   labelText: "Keterangan", //label text of field
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)
-                    )
+                    borderRadius: BorderRadius.all(Radius.circular(5.0))
                   )
               ),
             ),
-
-            SizedBox(
-              height: 20.0
-            ),
-            Row(
-              children: <Widget>[
-                Radio(
-                  value: 0,
-                  groupValue: this.selected,
-                  onChanged: (int? value) {
-                    onChanged(value);
-                  }
-                ),
-                Container(
-                  width: 8.0,
-                ),
-                Text('Cash'),
-                Radio(
-                  value: 1,
-                  groupValue: this.selected,
-                  onChanged: (int? value) {
-                    onChanged(value);
-                  }
-                ),
-                Container(
-                  width: 8.0,
-                ),
-                Text('Non-cash')
-              ],
-            ),
-
             SizedBox(height: 25.0),
             // TOMBOL SIMPAN
             Row(
@@ -423,7 +408,7 @@ class inputFakeState extends State<inputFake> {
                         style: TextStyle(fontSize: 15),
                       ),
                       onPressed: () {
-                        print('Id User : ${widget.id_user}');
+                        print('Id User : ${widget.level}');
                         tambahTransaksi();
                       },
                     ),

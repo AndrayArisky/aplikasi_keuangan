@@ -21,21 +21,15 @@ class bebanState extends State<beban> {
     final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getdata.php'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
-      // List<dynamic> data = jsonDecode(response.body);
-      
+      final akun = jsonData.where((data) => data['neraca'] == 'Biaya/Beban').toList();
       setState(() {
-        Data = jsonData;
+        Data = akun;
       });
-      
-      // Lakukan filter atau manipulasi data sesuai kebutuhan Anda
-    //List<dynamic> filteredData = data.where((getdata) => getdata['neraca'] == 'Aset').toList();
-    
-    // Mengubah filteredData menjadi List<Item>
-    //List<Items> itemList = filteredData.map((item) => Items.fromJson(item)).toList();
     } else {
       throw Exception('Gagal mengambil data!');
     }
   }
+
 
 
   @override

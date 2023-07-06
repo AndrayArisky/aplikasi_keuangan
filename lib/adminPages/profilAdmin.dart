@@ -18,11 +18,12 @@ class _profilAdminState extends State<profilAdmin>{
   }
 
   Future<void> fetchData() async {
-    final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getprofil.php'));
+    final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getdata.php'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
+      final user = jsonData.where((data) => data['level'] == 'admin').toList();
       setState(() {
-        Data = jsonData;
+        Data = user;
       });
     } else {
       throw Exception('Gagal mengambil data!');
@@ -31,18 +32,42 @@ class _profilAdminState extends State<profilAdmin>{
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      extendBody: true,
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            ProfilHeader(
-              title: "Nama Usaha",
-              subtitle: "Alamat Usaha",
+    extendBodyBehindAppBar: true,
+    extendBody: true,
+    body: SingleChildScrollView(
+      child: Column(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.all(20),
+            child: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      //title,
+                      'bbb',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      //subtitle,
+                      'yyy',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+            ),
             ),
             SizedBox(height: 10,),
-            adminInfo(),
+            adminInfo(Data: Data),
           ],
         ),
       ),
@@ -51,6 +76,9 @@ class _profilAdminState extends State<profilAdmin>{
 }
 
 class adminInfo extends StatelessWidget {
+  final List<dynamic> Data;
+  const adminInfo({super.key, required this.Data});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -82,7 +110,7 @@ class adminInfo extends StatelessWidget {
           Card(
             child: Container(
               alignment: Alignment.topLeft,
-              padding: EdgeInsets.all(15),
+              padding: EdgeInsets.all(20),
               child: Column(
                 children: <Widget>[
                   Column(
@@ -96,36 +124,36 @@ class adminInfo extends StatelessWidget {
                               vertical: 4
                             ),
                             leading: Icon(Icons.person),
-                            title: Text("Nama Karyawan"),
-                            subtitle: Text("Arisky"),
+                            title: Text("Nama Pemilik Usaha"),
+                            subtitle: Text(Data.isNotEmpty ? Data[0]['nama'] : ''),
                           ),
                           ListTile(
                             leading: Icon(Icons.mail_outlined),
                             title: Text("Email"),
-                            subtitle: Text("Andray"),
+                            subtitle: Text(Data.isNotEmpty ? Data[0]['email'] : ''),
                           ),
                           ListTile(
                             leading: Icon(Icons.phone),
                             title: Text("No. HP/Telp"),
-                            subtitle: Text("Andray"),
+                            subtitle: Text('nohp'),
                           ),
-                          ListTile(
-                            leading: Icon(Icons.business_rounded),
-                            title: Text("Bidang Usaha"),
-                            subtitle: Text("Andray"
-                            ),
-                          ),
-                          ListTile(
-                            leading: Icon(
-                              Icons.format_list_numbered_sharp
-                            ),
-                            title: Text(
-                              "NPWP Usaha"
-                            ),
-                            subtitle: Text(
-                              "Andray"
-                            ),
-                          )
+                          // ListTile(
+                          //   leading: Icon(Icons.business_rounded),
+                          //   title: Text("Bidang Usaha"),
+                          //   subtitle: Text("Andray"
+                          //   ),
+                          // ),
+                          // ListTile(
+                          //   leading: Icon(
+                          //     Icons.format_list_numbered_sharp
+                          //   ),
+                          //   title: Text(
+                          //     "NPWP Usaha"
+                          //   ),
+                          //   subtitle: Text(
+                          //     "Andray"
+                          //   ),
+                          // )
                         ]
                       )
                     ],
@@ -141,47 +169,48 @@ class adminInfo extends StatelessWidget {
 
 }
 
-class ProfilHeader extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final List<Widget>? action;
+// class ProfilHeader extends StatelessWidget {
+//   final String title;
+//   final String subtitle;
 
-  const ProfilHeader({
-    super.key, 
-    required this.title, 
-    required this.subtitle, 
-    this.action
-  });
+//   const ProfilHeader({
+//     super.key, 
+//     required this.title, 
+//     required this.subtitle, 
+//   });
   
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        Container(
-          width: double.infinity,
-          margin: EdgeInsets.only(top: 50),
-          child: Column(
-            children: <Widget>[
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              if (subtitle != null) ...[
-                SizedBox(
-                  height: 5.0,
-                ),
-                Text(
-                  subtitle,
-                  style: Theme.of(context).textTheme.titleSmall,
-                )
-              ]
-            ],
-          ),
-        )
-      ],
-    );
-  }
+//   @override
+//   Widget build(BuildContext context) {
+//     return Stack(
+//       children: <Widget>[
+//         Container(
+//           width: double.infinity,
+//           margin: EdgeInsets.only(top: 50),
+//           child: Column(
+//             children: <Widget>[
+//               Text(
+//                 title,
+//                 style: TextStyle(
+//                   fontSize: 20,
+//                   color: Colors.black
+//                 ),
+//               ),
+//               if (subtitle != null) ...[
+//                 SizedBox(
+//                   height: 5.0,
+//                 ),
+//                 Text(
+//                   subtitle,
+//                   style: Theme.of(context).textTheme.titleSmall,
+//                 )
+//               ]
+//             ],
+//           ),
+//         )
+//       ],
+//     );
+//   }
 
 
 
-}
+// }

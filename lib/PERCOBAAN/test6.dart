@@ -4,12 +4,12 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/date_symbol_data_local.dart';
 
-class labaRugi extends StatefulWidget {
+class LaporanPosisiKeuangan extends StatefulWidget {
   @override
-  _labaRugiState createState() => _labaRugiState();
+  _LaporanPosisiKeuanganState createState() => _LaporanPosisiKeuanganState();
 }
 
-class _labaRugiState extends State<labaRugi> {
+class _LaporanPosisiKeuanganState extends State<LaporanPosisiKeuangan> {
   List<dynamic> dataTransaksi = [];
   List<dynamic> sortedDates = [];
   List<String> distinctMonthAndYear = [];
@@ -54,7 +54,8 @@ class _labaRugiState extends State<labaRugi> {
       DateTime dateTime = sortedDates[i];
       var formatBulan = DateFormat.MMM();
       String namaBulan = formatBulan.format(dateTime);
-      String monthAndYear = "$namaBulan ${dateTime.year.toString().substring(2)}";
+      String monthAndYear =
+          "$namaBulan ${dateTime.year.toString().substring(2)}";
       if (!distinctMonthAndYear.contains(monthAndYear)) {
         bool bulanPunyaData = false;
         for (var j = 0; j < dataTransaksi.length; j++) {
@@ -62,7 +63,8 @@ class _labaRugiState extends State<labaRugi> {
           DateTime dateTime = DateTime.parse(tglTransaksi);
           var formatBulan = DateFormat.MMM();
           String namaBulan = formatBulan.format(dateTime);
-          String monthAndYearTransaction = "$namaBulan ${dateTime.year.toString().substring(2)}";
+          String monthAndYearTransaction =
+              "$namaBulan ${dateTime.year.toString().substring(2)}";
           if (monthAndYearTransaction == monthAndYear) {
             bulanPunyaData = true;
             break;
@@ -130,36 +132,38 @@ class _labaRugiState extends State<labaRugi> {
                       );
                     }).toList(),
                     indicator: UnderlineTabIndicator(
-                      borderSide: BorderSide(
-                        color: Colors.blue, 
-                        width: 4
-                      )
-                    ),
+                        borderSide: BorderSide(color: Colors.blue, width: 4)),
                   ),
                 ),
               ),
               Expanded(
                 child: TabBarView(
                   children: distinctMonthAndYear.map((monthAndYear) {
-                    List<dynamic> transactions = dataTransaksi.where((transaction) {
-                      DateTime dateTime = DateTime.parse(transaction['tgl_transaksi']);
-                      var formatBulan = DateFormat.MMM();
-                      String namaBulan = formatBulan.format(dateTime);
-                      String monthAndYearTransaction = "$namaBulan ${dateTime.year.toString().substring(2)}";
-                      return monthAndYearTransaction == monthAndYear;
-                    }).toList();
+                    List<dynamic> transactions = dataTransaksi
+                        .where((transaction) {
+                          DateTime dateTime = DateTime.parse(transaction['tgl_transaksi']);
+                          var formatBulan = DateFormat.MMM();
+                          String namaBulan = formatBulan.format(dateTime);
+                          String monthAndYearTransaction = "$namaBulan ${dateTime.year.toString().substring(2)}";
+                          return monthAndYearTransaction == monthAndYear;
+                        })
+                        .toList();
 
-                    Map<String, int> totalPendapatan = {};
-                    Map<String, int> totalPengeluaran = {};
+                    Map<String, int> totalAset = {};
+                    Map<String, int> totalLiabilitas = {};
+                    Map<String, int> totalEkuitas = {};
 
                     transactions.forEach((transaction) {
                       String namaTransaksi = transaction['kategori'];
                       int nilaiTransaksi = int.parse(transaction['nominal'].toString());
-                      String status = transaction['status'];
-                      if (status == 'Pemasukan') {
-                        totalPendapatan[namaTransaksi] = (totalPendapatan[namaTransaksi] ?? 0) + nilaiTransaksi;
-                      } else if (status == 'Pengeluaran') {
-                        totalPengeluaran[namaTransaksi] = (totalPengeluaran[namaTransaksi] ?? 0) + nilaiTransaksi;
+                      String grup = transaction['grup'];
+
+                      if (grup == 'Aset') {
+                        totalAset[namaTransaksi] = (totalAset[namaTransaksi] ?? 0) + nilaiTransaksi;
+                      } else if (grup == 'Liabilitas') {
+                        totalLiabilitas[namaTransaksi] = (totalLiabilitas[namaTransaksi] ?? 0) + nilaiTransaksi;
+                      } else if (grup == 'Ekuitas') {
+                        totalEkuitas[namaTransaksi] = (totalEkuitas[namaTransaksi] ?? 0) + nilaiTransaksi;
                       }
                     });
 
@@ -169,23 +173,28 @@ class _labaRugiState extends State<labaRugi> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: <Widget>[
-                            _buildItemRow('Pendapatan'),
+                            _buildItemRow('Aset'),
                             SizedBox(height: 10.0),
-                            ...totalPendapatan.entries.map((entry) => _buildAkunRow(entry.key, entry.value.toString())).toList(),
+                            ...totalAset.entries.map((entry) => _buildAkunRow(entry.key, entry.value.toString())).toList(),
                             Divider(),
-                            _buildTotalRow('Total Pendapatan', '${rupiah.format(totalPendapatan.values.fold(0, (a, b) => a + b))}'),
+                            _buildTotalRow('Total Aset', '${rupiah.format(totalAset.values.fold(0, (a, b) => a + b))}'),
                             Divider(),
                             SizedBox(height: 20.0),
-                            _buildItemRow('Biaya/Beban'),
+                            _buildItemRow('Liabilitas'),
                             SizedBox(height: 10.0),
-                            ...totalPengeluaran.entries.map((entry) => _buildAkunRow(entry.key, entry.value.toString())).toList(),
+                            ...totalLiabilitas.entries.map((entry) => _buildAkunRow(entry.key, entry.value.toString())).toList(),
                             Divider(),
-                            _buildTotalRow('Total Biaya/Beban', '${rupiah.format(totalPengeluaran.values.fold(0, (a, b) => a + b))}'),
+                            _buildTotalRow('Liabilitas', '${rupiah.format(totalLiabilitas.values.fold(0, (a, b) => a + b))}'),
                             Divider(),
                             SizedBox(height: 40.0),
-                            _buildTotalRow('Total Laba(Rugi) Sebelum Pajak', '${rupiah.format(totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b))}'),
-                            _buildTotalRow('Biaya Pajak Penghasilan', '${rupiah.format(0.04 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b)))}'),
-                            _buildTotalRow('Total Laba(Rugi) Setelah Pajak', '${rupiah.format((totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b)) - (0.04 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b))))}'),
+                            _buildItemRow('Ekuitas'),
+                            SizedBox(height: 10.0),
+                            ...totalEkuitas.entries.map((entry) => _buildAkunRow(entry.key, entry.value.toString())).toList(),
+                            Divider(),
+                            _buildTotalRow('Ekuitas', '${rupiah.format(totalEkuitas.values.fold(0, (a, b) => a + b))}'),
+                            //_buildTotalRow('Total Laba(Rugi) Sebelum Pajak', '${rupiah.format(totalAset.values.fold(0, (a, b) => a + b) - totalLiabilitas.values.fold(0, (a, b) => a + b))}'),
+                            //_buildTotalRow('Biaya Pajak Penghasilan', '${rupiah.format(0.04 * (totalAset.values.fold(0, (a, b) => a + b) - totalLiabilitas.values.fold(0, (a, b) => a + b)))}'),
+                            //_buildTotalRow('Total Laba(Rugi) Setelah Pajak', '${rupiah.format((totalAset.values.fold(0, (a, b) => a + b) - totalLiabilitas.values.fold(0, (a, b) => a + b)) - (0.04 * (totalAset.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b))))}'),
                           ],
                         ),
                       ),

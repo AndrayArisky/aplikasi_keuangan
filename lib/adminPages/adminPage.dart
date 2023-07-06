@@ -1,34 +1,59 @@
+import 'package:aplikasi_keuangan/PERCOBAAN/test6.dart';
+import 'package:aplikasi_keuangan/adminPages/anggota/dataAnggota.dart';
+import 'package:aplikasi_keuangan/adminPages/anggota/tambahAnggota.dart';
 import 'package:aplikasi_keuangan/adminPages/laporan/labaRugi.dart';
 import 'package:aplikasi_keuangan/adminPages/laporan/posisiKeuangan.dart';
 import 'package:aplikasi_keuangan/adminPages/profilAdmin.dart';
-import 'package:aplikasi_keuangan/adminPages/tambahAnggota.dart';
+import 'package:aplikasi_keuangan/adminPages/transaksi/inputAdmin.dart';
 import 'package:aplikasi_keuangan/adminPages/transaksiAdmin.dart';
 import 'package:aplikasi_keuangan/akunPages/tabBarAkun.dart';
-import 'package:aplikasi_keuangan/karyawanPages/transaksiKaryawan.dart';
 import 'package:aplikasi_keuangan/mainPage/loginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 
 class adminPage extends StatefulWidget {
-  final dynamic id_user;
-  adminPage({super.key, required this.id_user}); 
+  final dynamic level;
+  adminPage({super.key, required this.level}); 
 
   @override
   _adminPageState createState() => _adminPageState();
 }
 
 class _adminPageState extends State<adminPage>{
-  //late dynamic id_user;
   late final Widget? endDrawer;
   int _selectedIndex = 0;
   var selectedPage =  [
     transaksiAdmin(),
-    tabBarAkun(),
+    //tabBarAkun(),
     //ProfilPage()
     profilAdmin(),
     // profilAdmin(), 
   ];
+    List<dynamic> user = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+    var level = widget.level;
+  }
+
+  Future<void> fetchData() async {
+    final response = await http
+        .get(Uri.parse('https://apkeu2023.000webhostapp.com/getUser.php'));
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      final admin = jsonData.where((data) => data['level'] == 'admin').toList();
+      setState(() {
+        user = admin;
+      });
+    } else {
+      throw Exception('Gagal mengambil data!');
+    }
+  }
 
   Future<void> clearLoginData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -36,165 +61,45 @@ class _adminPageState extends State<adminPage>{
   }
 
   @override
-  void initState() {
-    super.initState();
-    var id_user = widget.id_user;
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       appBar: AppBar(
         title: Text('Catatan Keuangan'),
         elevation: 2,
-        
-        // KOMENTAR
-        /*     
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.menu
-            ),
-            onPressed: () {
-              /*
-              showModalBottomSheet(
-                context: context, 
-                builder: (BuildContext context) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20)
-                      ),
-                      color: Colors.white
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          height: 150,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 6,
-                                offset: Offset(0, 3)
-                              )
-                            ]
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: ElevatedButton(
-                                              onPressed: () {
-
-                                              }, 
-                                              child: Text(
-                                                'Laporan Laba Rugi',
-                                                style: TextStyle(
-                                                  fontSize: 14
-                                                ),
-                                              )
-                                            ),
-                                          ),
-                                          SizedBox(width: 10),
-                                          Expanded(
-                                            child: ElevatedButton(
-                                              onPressed: () {
-
-                                              }, 
-                                              child: Text(
-                                                'Laporan Posisi Keuangan',
-                                                style: TextStyle(
-                                                  fontSize: 14
-                                                ),
-                                              )
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 10), 
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                Card(
-                                  child: ListTile(
-                                    leading: Icon(
-                                      Icons.settings
-                                    ),
-                                    title: Text('Pengaturan'),
-                                  ),
-                                ),
-                                Card(
-                                  child: ListTile(
-                                    leading: Icon(
-                                      Icons.logout
-                                    ),
-                                    title: Text('Logout'),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  );
-                }
-              );
-              */
-            },
-          ),
-
-          /*
-          TextButton(
-            onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => loginPage()),
-                  (route) => false);
-            }, child: Icon(
-              Icons.menu,
-              color: Colors.black,
-            ),
-          )*/
-        
-        ],
-        */
       ),
       endDrawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
             _drawerHeader(),
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0, top: 5, bottom: 5),
+              child: Text(
+                "Manajemen Pengguna",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black54,
+                )),
+            ),
             _drawerItem(
               icon: Icons.add_circle_outline_sharp,
               text: 'Tambah Anggota',
               onTap: () {
-                Navigator. of( context ) .push ( MaterialPageRoute (
-                  builder: ( BuildContext context ) => tambahAnggota(id_user: 22))
+                Navigator.of(context).push (
+                  MaterialPageRoute (
+                    builder:(BuildContext context) => tambahAnggota(level: 'admin')
+                  )
+                );
+              }
+            ),
+            _drawerItem(
+              icon: Icons.people_alt_rounded,
+              text: 'Data Karyawan',
+              onTap: () {
+                Navigator.of(context).push (
+                  MaterialPageRoute (
+                    builder:(BuildContext context) => dataAnggota()
+                  )
                 );
               }
             ),
@@ -206,13 +111,15 @@ class _adminPageState extends State<adminPage>{
                   fontSize: 16,
                   color: Colors.black54,
                 )),
-          ),
+            ),
             _drawerItem(
               icon: Icons.bar_chart_outlined,
               text: 'Laba Rugi',
               onTap: () {
-                Navigator. of( context ) .push ( MaterialPageRoute (
-                  builder: ( BuildContext context ) => labaRugi())
+                Navigator.of(context).push (
+                  MaterialPageRoute (
+                    builder:(BuildContext context) => labaRugi()
+                  )
                 );
               }
             ),
@@ -220,8 +127,10 @@ class _adminPageState extends State<adminPage>{
               icon: Icons.grain_rounded,
               text: 'Posisi Keuangan',
               onTap: () {
-                Navigator. of( context ) .push ( MaterialPageRoute (
-                  builder: ( BuildContext context ) => posisiKeuangan())
+                Navigator.of(context).push (
+                  MaterialPageRoute (
+                    builder:(BuildContext context) => LaporanPosisiKeuangan()
+                  )
                 );
               }
               ),
@@ -247,20 +156,21 @@ class _adminPageState extends State<adminPage>{
           ]
         ),
       ),
-
-      // KOMENTAR
-      /*
+      
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => tambahTransaksi()));
+            context,
+            MaterialPageRoute(
+              builder: (context) => inputAdmin(level: 'admin',)
+            )
+          );
         },
         backgroundColor: Colors.blue,
         child: Icon(Icons.add, color: Colors.black),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      */
+      
 
       body: selectedPage[_selectedIndex],
       bottomNavigationBar: BottomAppBar(
@@ -291,31 +201,31 @@ class _adminPageState extends State<adminPage>{
                 ),
                 iconSize: 30,
               ),
+              // IconButton(
+              //   onPressed: () {
+              //     selectedPage[1];
+              //     setState(() {
+              //       _selectedIndex = 1;
+              //       print('Halaman Nama Akun');
+              //     });
+              //   }, 
+              //   icon: Icon(
+              //     Icons.category_outlined,
+              //     color: _selectedIndex == 1 ? Colors.black : Colors.white,
+              //   ),
+              //   iconSize: 30,
+              // ),
               IconButton(
                 onPressed: () {
                   selectedPage[1];
                   setState(() {
                     _selectedIndex = 1;
-                    print('Halaman Nama Akun');
-                  });
-                }, 
-                icon: Icon(
-                  Icons.category_outlined,
-                  color: _selectedIndex == 1 ? Colors.black : Colors.white,
-                ),
-                iconSize: 30,
-              ),
-              IconButton(
-                onPressed: () {
-                  selectedPage[2];
-                  setState(() {
-                    _selectedIndex = 2;
                     print('Halaman Profil');
                   });
                 }, 
                 icon: Icon(
                   Icons.person,
-                  color: _selectedIndex == 2 ? Colors.black : Colors.white,
+                  color: _selectedIndex == 1 ? Colors.black : Colors.white,
                 ),
                 iconSize: 30,
               ),
@@ -334,7 +244,10 @@ Widget _drawerHeader() {
   );
 }
 
-Widget _drawerItem({required IconData icon, required String text, required GestureTapCallback onTap}) {
+Widget _drawerItem({
+  required IconData icon, 
+  required String text, 
+  required GestureTapCallback onTap}) {
   return ListTile(
     title: Row(
       children: <Widget>[
@@ -351,17 +264,5 @@ Widget _drawerItem({required IconData icon, required String text, required Gestu
       ],
     ),
     onTap: onTap,
-  );
-}
-
-
-void Logout(BuildContext context) {
-  final scaffold = ScaffoldMessenger.of(context);
-  scaffold.showSnackBar(
-    SnackBar(
-      content: Text("Anda berhasil logout!"),
-      action:
-          SnackBarAction(label: 'OK', onPressed: scaffold.hideCurrentSnackBar),
-    ),
   );
 }
