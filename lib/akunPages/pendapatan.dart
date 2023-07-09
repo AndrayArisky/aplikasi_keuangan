@@ -40,14 +40,14 @@ class pendapatanState extends State<pendapatan> {
           children: [
             DataTable(
               columns: [
-                DataColumn(label: Text('Kode')),
+                //DataColumn(label: Text('Kode')),
                 DataColumn(label: Text('Nama Akun')),
                 DataColumn(label: Text('Grup'))
               ], 
               rows: Data.map(
                 (getdata) => DataRow(
                   cells: [
-                    DataCell(Text(getdata['kode_akun'].toString())),
+                    //DataCell(Text(getdata['kode_akun'].toString())),
                     DataCell(Text(getdata['nm_akun'].toString())),
                     DataCell(Text(getdata['grup'].toString())),
                   ]

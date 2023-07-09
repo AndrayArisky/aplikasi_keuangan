@@ -1,3 +1,4 @@
+import 'package:aplikasi_keuangan/PERCOBAAN/test2.dart';
 import 'package:aplikasi_keuangan/PERCOBAAN/test6.dart';
 import 'package:aplikasi_keuangan/adminPages/anggota/dataAnggota.dart';
 import 'package:aplikasi_keuangan/adminPages/anggota/tambahAnggota.dart';
@@ -5,7 +6,8 @@ import 'package:aplikasi_keuangan/adminPages/laporan/labaRugi.dart';
 import 'package:aplikasi_keuangan/adminPages/laporan/posisiKeuangan.dart';
 import 'package:aplikasi_keuangan/adminPages/profilAdmin.dart';
 import 'package:aplikasi_keuangan/adminPages/transaksi/inputAdmin.dart';
-import 'package:aplikasi_keuangan/adminPages/transaksiAdmin.dart';
+import 'package:aplikasi_keuangan/PERCOBAAN/pdf.dart';
+import 'package:aplikasi_keuangan/adminPages/transaksi/transaksiAdmin.dart';
 import 'package:aplikasi_keuangan/akunPages/tabBarAkun.dart';
 import 'package:aplikasi_keuangan/mainPage/loginPage.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +34,7 @@ class _adminPageState extends State<adminPage>{
     profilAdmin(),
     // profilAdmin(), 
   ];
-    List<dynamic> user = [];
+  List<dynamic> user = [];
 
   @override
   void initState() {
@@ -42,8 +44,7 @@ class _adminPageState extends State<adminPage>{
   }
 
   Future<void> fetchData() async {
-    final response = await http
-        .get(Uri.parse('https://apkeu2023.000webhostapp.com/getUser.php'));
+    final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getUser.php'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       final admin = jsonData.where((data) => data['level'] == 'admin').toList();
@@ -71,7 +72,19 @@ class _adminPageState extends State<adminPage>{
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            _drawerHeader(),
+            _drawerHeader(context, user),
+            _drawerItem(
+              icon: Icons.category_outlined,
+              text: 'Daftar Akun',
+              onTap: () {
+                Navigator.of(context).push (
+                  MaterialPageRoute (
+                    builder:(BuildContext context) => tabBarAkun()
+                  )
+                );
+              }
+            ),
+            Divider(height: 15, thickness: 1),
             Padding(
               padding: const EdgeInsets.only(left: 20.0, top: 5, bottom: 5),
               child: Text(
@@ -96,6 +109,7 @@ class _adminPageState extends State<adminPage>{
               icon: Icons.people_alt_rounded,
               text: 'Data Karyawan',
               onTap: () {
+                var data;
                 Navigator.of(context).push (
                   MaterialPageRoute (
                     builder:(BuildContext context) => dataAnggota()
@@ -237,10 +251,11 @@ class _adminPageState extends State<adminPage>{
   }
 }
 
-Widget _drawerHeader() {
+Widget _drawerHeader(BuildContext context, List<dynamic> user) {
+  
   return UserAccountsDrawerHeader(
-    accountName: Text('Nama Admin'),
-    accountEmail: Text('test@gmail.com'),
+    accountName: Text('${user.isNotEmpty ? user[0]['usaha'] : ''}'),
+    accountEmail: Text('${user.isNotEmpty ? user[0]['alamat'] : ''}'),
   );
 }
 

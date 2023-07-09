@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:aplikasi_keuangan/adminPages/adminPage.dart';
+import 'package:aplikasi_keuangan/adminPages/anggota/dataAnggota.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
@@ -46,7 +47,6 @@ class _tambahAnggotaState extends State<tambahAnggota> {
   void tambahAnggota() async {
     var url = Uri.parse('http://apkeu2023.000webhostapp.com/inputAnggota.php');
     var body = {
-      //'id_user': widget.id_user.toString(),
       'nama': nama.text,
       'email': email.text,
       'nohp': nohp.text,
@@ -63,53 +63,34 @@ class _tambahAnggotaState extends State<tambahAnggota> {
     
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
-      if (result['message'] == 'Berhasil menambah anggota baru') {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Berhasil menambah anggota baru!"),
-              actions: <Widget>[
-                ElevatedButton(
-                  child: Text("OK"),
-                  onPressed: () {
-                    //Navigator.of(context).pop();
-                    // Navigator.pushReplacement(
-                    //   context, 
-                    //   MaterialPageRoute(
-                    //     builder: (context) => adminPage(level: 'admin')
-                    //   )
-                    // );
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => adminPage(level: 'admin'),
-                      ),
-                    );
-                  },
-                )
-              ],
-            );
-          },
+      if (result['message'] == 'Data berhasil disimpan') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Data berhasil ditambahkan'
+            ),
+            action: SnackBarAction(
+              label: 'Oke',
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/dataAnggota');
+              },
+            ),
+          ),  
         );
+        
       } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Gagal menambah anggota!"),
-              content: Text("Pastikan data yang anda input sudah benar!"),
-              // content: Text(result["message"]),
-              actions: <Widget>[
-                ElevatedButton(
-                  child: Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
-              ],
-            );
-          },
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Data gagal ditambahkan'
+            ),
+            action: SnackBarAction(
+              label: 'Oke',
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
         );
       }
     }

@@ -25,23 +25,6 @@ class inputAdmin extends StatefulWidget {
 
 class inputAdminState extends State<inputAdmin> {
 
-  List<Tipe> pemasukanData = [
-    Tipe(title: 'Pendapatan Jasa', type: 'Pemasukan'),
-    Tipe(title: 'Pendapatan Giveaway', type: 'Pemasukan'),
-    Tipe(title: 'Dapat Dari Baim Wong', type: 'Pemasukan'),
-  ];
-  List<Tipe> pengeluaranData = [
-    Tipe(title: 'Harga Pokok Penjualan', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Perlengkapan/ATK', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Gaji Karyawan', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Sewa', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Listrik', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Air', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Lain-lain', type: 'Pengeluaran'),
-  ];
-  
-  // DI CHATGPT BUAT MUNCUL DATA DI SHOWMODALBUTTON
-
   int? selected = -1;
   int selectedIndex = 2;
   String status = 'Pengeluaran';
@@ -50,9 +33,40 @@ class inputAdminState extends State<inputAdmin> {
   String id_user = '1';
   String? selectedOption;
 
+  List<Tipe> pemasukanData = [];
+  List<Tipe> pengeluaranData = [];
+
   final kategori = TextEditingController();
   final nominal = TextEditingController();
   final keterangan = TextEditingController();
+
+  Future<List<Tipe>> fetchTipeData() async {
+    var url = Uri.parse('http://apkeu2023.000webhostapp.com/getdata.php');
+    var response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body) as List<dynamic>;
+      return data.map((item) => Tipe(
+        title: item['nm_akun'],
+        type: item['tipe'],
+      )).toList();
+    } else {
+      throw Exception('Failed to fetch tipe data');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchTipeData().then((data) {
+      setState(() {
+        pemasukanData = data.where((tipe) => tipe.type == 'pm').toList();
+        pengeluaranData = data.where((tipe) => tipe.type == 'pr').toList();
+      });
+    }).catchError((error) {
+      print('Error: $error');
+    });
+  }
 
   // FUNGSI TOMBOL SIMPAN
   void tambahTransaksi() async {
@@ -109,7 +123,6 @@ class inputAdminState extends State<inputAdmin> {
               title: Text("Gagal menyimpan data!"),
               content:
                   Text("Pastikan data yang anda input sudah benar!"),
-              // content: Text(result["message"]),
               actions: <Widget>[
                 ElevatedButton(
                   child: Text("OK"),
@@ -222,7 +235,7 @@ class inputAdminState extends State<inputAdmin> {
           ),
         ),
         body: Container(
-          padding: EdgeInsets.fromLTRB(35, 20, 20, 20),
+          padding: EdgeInsets.all(20),
           child: Column(
             children: <Widget>[
             // TOMBOL PEMASUKAN DAN PENGELUARAN

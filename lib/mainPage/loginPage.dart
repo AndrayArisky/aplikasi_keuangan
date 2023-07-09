@@ -24,7 +24,6 @@ class _loginPageState extends State<loginPage> {
   
   void clear() {
     setState(() {
-      username.clear();
       password.clear();
     });
   }

@@ -1,7 +1,4 @@
 import 'dart:convert';
-import 'package:aplikasi_keuangan/PERCOBAAN/test7.dart';
-import 'package:aplikasi_keuangan/adminPages/adminPage.dart';
-import 'package:aplikasi_keuangan/PERCOBAAN/inputFake.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -17,6 +14,20 @@ class _transaksiAdminState extends State<transaksiAdmin> {
   List<dynamic> dataTransaksi = [];
   List<dynamic> sortedDates = [];
   List<String> distinctMonthAndYear = [];
+  List<dynamic> searchResults = [];
+
+  TextEditingController search = TextEditingController();
+
+  void searchData(String keyword) {
+    setState(() {
+      searchResults = dataTransaksi.where((transaction) {
+        String kategori = transaction['kategori'];
+        String keterangan = transaction['keterangan'];
+        return kategori.toLowerCase().contains(keyword.toLowerCase()) ||
+          keterangan.toLowerCase().contains(keyword.toLowerCase());
+      }).toList();
+    });
+  }
 
   @override
   void initState() {
@@ -35,12 +46,12 @@ class _transaksiAdminState extends State<transaksiAdmin> {
           String tglTransaksi = dataTransaksi[i]['tgl_transaksi'];
           DateTime dateTime = DateTime.parse(tglTransaksi);
           sortedDates.add(dateTime);
-          print('sortedDates : $sortedDates');
+          //print('sortedDates : $sortedDates');
         }
         sortedDates.sort((a, b) => a.compareTo(b));
         if (sortedDates != null && sortedDates.isNotEmpty) {
           distinctMonthAndYear = _getDistinctMonthAndYear();
-          print('distinctMonthAndYear : $distinctMonthAndYear');
+          //print('distinctMonthAndYear : $distinctMonthAndYear');
         }
       });
     } else {
@@ -190,6 +201,50 @@ class _transaksiAdminState extends State<transaksiAdmin> {
 
                 return Column(
                   children: <Widget>[
+                    Column(
+                      children: <Widget>[
+                        Material(
+                          elevation: 2,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(30)
+                          ),
+                          child: TextField(
+                            controller: search,
+                            onChanged: searchData,
+                            cursorColor: Colors.blue,
+                            //style: DropdownMenuItem,
+                            decoration: InputDecoration(
+                              hintText: 'Cari Transaksi',
+                              hintStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12
+                              ),
+                              prefixIcon: Material(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30)
+                                ),
+                                child: Icon(
+                                  Icons.search,
+                                  //color: Colors.black,
+                                ),
+                              ),
+                              //border: InputBorder.none,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30)
+                                ),
+                                borderSide: BorderSide(width: 0.5),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 25,
+                                vertical: 13
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 10,),
                     // Box total pemasukan dan pengeluaran
                     Card(
                       elevation: 2.0,
@@ -199,7 +254,7 @@ class _transaksiAdminState extends State<transaksiAdmin> {
                           Expanded(
                             child: ListTile(
                               leading: Container(
-                                alignment: Alignment.bottomCenter,
+                                alignment: Alignment.center,
                                 width: 45,
                                 child: Icon(
                                   Icons.download,
@@ -210,14 +265,14 @@ class _transaksiAdminState extends State<transaksiAdmin> {
                               title: Text(
                                 'Pemasukan',
                                 style: TextStyle(
-                                  fontSize: 13,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,
                                   fontWeight: FontWeight.bold
                                 ),
                               ),
                               subtitle: Text(
                                 '${rupiah.format(PemasukanTotal)}',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,
                                 ),
                               ),
                             ),
@@ -226,7 +281,7 @@ class _transaksiAdminState extends State<transaksiAdmin> {
                           Expanded(
                             child: ListTile(
                               leading: Container(
-                                alignment: Alignment.bottomCenter,
+                                alignment: Alignment.center,
                                 width: 45,
                                 child: Icon(
                                   Icons.upload,
@@ -237,13 +292,13 @@ class _transaksiAdminState extends State<transaksiAdmin> {
                               title: Text(
                                 'Pengeluaran',
                                 style: TextStyle(
-                                  fontSize: 13,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,
                                   fontWeight: FontWeight.bold),
                               ),
                               subtitle: Text(
                                 '${rupiah.format(PengeluaranTotal)}',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,
                                 ),
                               ),
                             ),
@@ -258,7 +313,15 @@ class _transaksiAdminState extends State<transaksiAdmin> {
                         itemCount: groupedTransactions.length,
                         itemBuilder: (context, index) {
                           String date = groupedTransactions.keys.elementAt(index);
-                          List<dynamic> transactions = groupedTransactions.values.elementAt(index);                       
+                          List<dynamic> transactions = groupedTransactions.values.elementAt(index);
+                          if (search.text.isNotEmpty) {
+                            transactions = transactions.where((transaction) {
+                              String kategori = transaction['kategori'];
+                              String keterangan = transaction['keterangan'];
+                              return kategori.toLowerCase().contains(search.text.toLowerCase()) ||
+                                  keterangan.toLowerCase().contains(search.text.toLowerCase());
+                            }).toList();
+                          }                       
                           return Card(
                             margin: EdgeInsets.symmetric(vertical: 5.0),
                             elevation: 2,
@@ -297,12 +360,24 @@ class _transaksiAdminState extends State<transaksiAdmin> {
                                       child: ListTile(
 // ONTAP UPDATE
                                         onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => EditTransaksi(level: 'admin',)
-                                            ),
-                                          );
+                                          // Navigator.push(
+                                          //   context,
+                                          //   MaterialPageRoute(
+                                          //     builder: (context) => EditTransaksi(level: 'admin',)
+                                          //   ),
+                                          // );
+                                          
+                                          // Navigator.of(context).popAndPushNamed(
+                                          //   '/editTransaksi',
+                                          //   arguments: [
+                                          //     transactions[index]['id_user'],
+                                          //     transactions[index]['kategori'],
+                                          //     transactions[index]['tgl_transaksi'],
+                                          //     transactions[index]['nominal'],
+                                          //     transactions[index]['keterangan'],
+                                          //     transactions[index]['status'],
+                                          //   ]
+                                          // );
                                         },       
                                         subtitle: Row(
                                           children: [

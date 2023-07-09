@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:aplikasi_keuangan/adminPages/adminPage.dart';
+import 'package:aplikasi_keuangan/karyawanPages/karyawanPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -25,32 +26,48 @@ class inputKaryawan extends StatefulWidget {
 
 class inputKaryawanState extends State<inputKaryawan> {
 
-  List<Tipe> pemasukanData = [
-    Tipe(title: 'Pendapatan Jasa', type: 'Pemasukan'),
-    Tipe(title: 'Pendapatan Giveaway', type: 'Pemasukan'),
-    Tipe(title: 'Dapat Dari Baim Wong', type: 'Pemasukan'),
-  ];
-  List<Tipe> pengeluaranData = [
-    Tipe(title: 'Harga Pokok Penjualan', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Perlengkapan/ATK', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Gaji Karyawan', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Sewa', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Listrik', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Air', type: 'Pengeluaran'),
-    Tipe(title: 'Beban Lain-lain', type: 'Pengeluaran'),
-  ];
-
   int? selected = -1;
   int selectedIndex = 2;
   String status = 'Pengeluaran';
   DateTime selectedDate = DateTime.now();
   String _formatNominal = '';
-  String id_user = '2';
+  String id_user = '1';
   String? selectedOption;
+
+  List<Tipe> pemasukanData = [];
+  List<Tipe> pengeluaranData = [];
 
   final kategori = TextEditingController();
   final nominal = TextEditingController();
   final keterangan = TextEditingController();
+
+  Future<List<Tipe>> fetchTipeData() async {
+    var url = Uri.parse('http://apkeu2023.000webhostapp.com/getdata.php');
+    var response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body) as List<dynamic>;
+      return data.map((item) => Tipe(
+        title: item['nm_akun'],
+        type: item['tipe'],
+      )).toList();
+    } else {
+      throw Exception('Failed to fetch tipe data');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchTipeData().then((data) {
+      setState(() {
+        pemasukanData = data.where((tipe) => tipe.type == 'pm').toList();
+        pengeluaranData = data.where((tipe) => tipe.type == 'pr').toList();
+      });
+    }).catchError((error) {
+      print('Error: $error');
+    });
+  }
 
   // FUNGSI TOMBOL SIMPAN
   void tambahTransaksi() async {
@@ -67,7 +84,7 @@ class inputKaryawanState extends State<inputKaryawan> {
     var response = await http.post(url, body: body);
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
-    print('ID USER : ${widget.level}, selectedDate $selectedDate');
+    //print('ID USER : ${widget.id_user}, selectedDate $selectedDate');
 
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
@@ -89,7 +106,7 @@ class inputKaryawanState extends State<inputKaryawan> {
                     Navigator.pushAndRemoveUntil(
                       context, 
                       MaterialPageRoute(
-                        builder: (context) => adminPage(level: 'karyawan')
+                        builder: (context) => karyawanPage(level: 'karyawan')
                       ),
                       (route) => false
                     );
@@ -105,9 +122,8 @@ class inputKaryawanState extends State<inputKaryawan> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text("Gagal menyimpan data!"),
-              // content:
-              //     Text("Pastikan data yang anda input sudah benar!"),
-              // content: Text(result["message"]),
+              content:
+                  Text("Pastikan data yang anda input sudah benar!"),
               actions: <Widget>[
                 ElevatedButton(
                   child: Text("OK"),
@@ -152,53 +168,49 @@ class inputKaryawanState extends State<inputKaryawan> {
     }
   }
 
-  // FUNGSI TOMBOL PEMASUKAN
   void addExpense() {
     setState(() {
       status = 'Pengeluaran';
       selectedIndex = 2;
       kategori.clear();
+      nominal.clear();
+      keterangan.clear();
     });
   }
 
-  // FUNGSI TOMBOL PENGELUARAN
   void addIncome() {
     setState(() {
       status = 'Pemasukan';
       selectedIndex = 1;
       kategori.clear();
+      nominal.clear();
+      keterangan.clear();
     });
   }
 
-  // FUNGSI TAMPIL DATA KATEGORI
-  void _showModalBottomSheet(List<Tipe> data) {
+  void _showModal(List<Tipe> data) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return Container(
           padding: EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: data.length,
-                itemBuilder: (BuildContext context, int index) {
-                  Tipe transaction = data[index];
-                  return ListTile(
-                    title: Text(transaction.title),
-                    onTap: () {
-                      setState(() {
-                        selectedOption = transaction.title;
-                        kategori.text = transaction.title;
-                      });
-                      Navigator.pop(context);
-                    },
-                  );
+          height: 300,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: data.length,
+            itemBuilder: (BuildContext context, int index) {
+              Tipe transaction = data[index];
+              return ListTile(
+                title: Text(transaction.title),
+                onTap: () {
+                  setState(() {
+                    selectedOption = transaction.title;
+                    kategori.text = transaction.title;
+                  });
+                  Navigator.pop(context);
                 },
-              ),
-            ],
+              );
+            },
           ),
         );
       },
@@ -210,9 +222,21 @@ class inputKaryawanState extends State<inputKaryawan> {
     return Scaffold(
         appBar: AppBar(
           title: Text('Tambah Transaksi'),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => karyawanPage(level: 'karyawan'),
+                ),
+                (route) => false,
+              );
+            },
+          ),
         ),
         body: Container(
-          padding: EdgeInsets.only(top: 35, right: 20, left: 20, bottom: 20),
+          padding: EdgeInsets.all(16),
           child: Column(
             children: <Widget>[
             // TOMBOL PEMASUKAN DAN PENGELUARAN
@@ -280,7 +304,7 @@ class inputKaryawanState extends State<inputKaryawan> {
                   onPressed: () {
                     
                     // Lakukan sesuatu saat tombol ikon ditekan
-                    _showModalBottomSheet(pengeluaranData);
+                    _showModal(pengeluaranData);
                     // String text = kategori.text;
                     // print('Nilai yang dimasukkan: $text');
                   },
@@ -296,9 +320,9 @@ class inputKaryawanState extends State<inputKaryawan> {
                 labelText: "Kategori $status",
                 suffixIcon: IconButton(
                   onPressed: () {
-
+                    
                     // Lakukan sesuatu saat tombol ikon ditekan
-                    _showModalBottomSheet(pemasukanData);
+                    _showModal(pemasukanData);
                     // String text = kategori.text;
                     // print('Nilai yang dimasukkan: $text');
                   },
@@ -366,43 +390,40 @@ class inputKaryawanState extends State<inputKaryawan> {
                   icon: Icon(Icons.edit_note_rounded), //icon of text field
                   labelText: "Keterangan", //label text of field
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)
-                    )
+                    borderRadius: BorderRadius.all(Radius.circular(5.0))
                   )
               ),
             ),
 
-            /*
-            SizedBox(
-              height: 20.0
-            ),
-            Row(
-              children: <Widget>[
-                Radio(
-                  value: 0,
-                  groupValue: this.selected,
-                  onChanged: (int? value) {
-                    onChanged(value);
-                  }
-                ),
-                Container(
-                  width: 8.0,
-                ),
-                Text('Cash'),
-                Radio(
-                  value: 1,
-                  groupValue: this.selected,
-                  onChanged: (int? value) {
-                    onChanged(value);
-                  }
-                ),
-                Container(
-                  width: 8.0,
-                ),
-                Text('Non-cash')
-              ],
-            ),
-            */
+            // SizedBox(
+            //   height: 20.0
+            // ),
+            // Row(
+            //   children: <Widget>[
+            //     Radio(
+            //       value: 0,
+            //       groupValue: this.selected,
+            //       onChanged: (int? value) {
+            //         onChanged(value);
+            //       }
+            //     ),
+            //     Container(
+            //       width: 8.0,
+            //     ),
+            //     Text('Cash'),
+            //     Radio(
+            //       value: 1,
+            //       groupValue: this.selected,
+            //       onChanged: (int? value) {
+            //         onChanged(value);
+            //       }
+            //     ),
+            //     Container(
+            //       width: 8.0,
+            //     ),
+            //     Text('Non-cash')
+            //   ],
+            // ),
 
             SizedBox(height: 25.0),
             // TOMBOL SIMPAN

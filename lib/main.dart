@@ -1,16 +1,12 @@
-import 'package:aplikasi_keuangan/PERCOBAAN/inputFake.dart';
-import 'package:aplikasi_keuangan/PERCOBAAN/test.dart';
-import 'package:aplikasi_keuangan/PERCOBAAN/test5.dart';
+import 'package:aplikasi_keuangan/PERCOBAAN/tes9.dart';
+import 'package:aplikasi_keuangan/PERCOBAAN/test2.dart';
+import 'package:aplikasi_keuangan/PERCOBAAN/test3.dart';
+import 'package:aplikasi_keuangan/PERCOBAAN/test8.dart';
 import 'package:aplikasi_keuangan/adminPages/anggota/dataAnggota.dart';
-import 'package:aplikasi_keuangan/adminPages/laporan/labaRugi.dart';
-import 'package:aplikasi_keuangan/adminPages/transaksiAdmin.dart';
-import 'package:aplikasi_keuangan/akunPages/tabBarAkun.dart';
-import 'package:aplikasi_keuangan/PERCOBAAN/inputFake.dart';
-import 'package:aplikasi_keuangan/karyawanPages/inputKaryawan.dart';
+import 'package:aplikasi_keuangan/adminPages/anggota/editAnggota.dart';
+import 'package:aplikasi_keuangan/adminPages/transaksi/editTransaksi.dart';
 import 'package:aplikasi_keuangan/karyawanPages/karyawanPage.dart';
-import 'package:aplikasi_keuangan/karyawanPages/profilKaryawan.dart';
-import 'package:aplikasi_keuangan/karyawanPages/transaksiKaryawan.dart';
-import 'package:aplikasi_keuangan/mainPage/loginPage.dart';
+import 'package:aplikasi_keuangan/mainPage/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:aplikasi_keuangan/adminPages/adminPage.dart';
 
@@ -26,9 +22,16 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Aplikasi Keuangan UMKM",
-      home: LR()
-      //home: adminPage(level: 'admin',)
-      //home: YourWidget(),
+      //home: editTesting(),
+      //home: karyawanPage(level: 'karyawan',),
+      home: adminPage(level: 'admin'),
+      //home: MyWidget(),
+      initialRoute: '/',
+      routes: {
+        '/editAnggota': (context) => editAnggota(level: 'admin', id_user: 1,),
+        '/dataAnggota': (context) => dataAnggota(),
+        //'/editTransaksi': (context) => editTransaksi(level: 'admin')
+      },
     );
   }
 }

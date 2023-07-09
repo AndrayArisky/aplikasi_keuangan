@@ -31,7 +31,7 @@ class _tabBarAkunState extends State<tabBarAkun>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(title: Text('Daftar Nama Akun')),
+      appBar: AppBar(title: Text('Daftar Nama Akun')),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

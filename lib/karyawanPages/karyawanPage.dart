@@ -1,4 +1,6 @@
+import 'package:aplikasi_keuangan/PERCOBAAN/tombolCari.dart';
 import 'package:aplikasi_keuangan/akunPages/tabBarAkun.dart';
+import 'package:aplikasi_keuangan/karyawanPages/inputKaryawan.dart';
 import 'package:aplikasi_keuangan/karyawanPages/profilKaryawan.dart';
 import 'package:aplikasi_keuangan/karyawanPages/transaksiKaryawan.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +20,7 @@ class karyawanPageState extends State<karyawanPage>{
   int _selectedIndex = 0;
   var selectedPage =  [
     transaksiKaryawan(),
-    tabBarAkun(),
+    //tabBarAkun(),
     profilKaryawan(), 
   ];
 
@@ -30,7 +32,6 @@ class karyawanPageState extends State<karyawanPage>{
   @override
   void initState() {
     super.initState();
-    var level = widget.level;
   }
 
   @override
@@ -39,6 +40,22 @@ class karyawanPageState extends State<karyawanPage>{
 
       appBar: AppBar(
         title: Text('Catatan Keuangan'),
+        actions: [
+            Tooltip(
+            message: 'Daftar Akun',
+            child: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => tabBarAkun(),
+                  ),
+                );
+              },
+              icon: Icon(Icons.category_outlined),
+            ),
+          ),
+        ],
         elevation: 2,
         
         // KOMENTAR
@@ -191,6 +208,20 @@ class karyawanPageState extends State<karyawanPage>{
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       */
 
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => inputKaryawan(level: 'karyawan')
+            )
+          );
+        },
+        backgroundColor: Colors.blue,
+        child: Icon(Icons.add, color: Colors.black),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+
       body: selectedPage[_selectedIndex],
       bottomNavigationBar: BottomAppBar(
         color: Colors.blue,
@@ -220,31 +251,31 @@ class karyawanPageState extends State<karyawanPage>{
                 ),
                 iconSize: 30,
               ),
+              // IconButton(
+              //   onPressed: () {
+              //     selectedPage[1];
+              //     setState(() {
+              //       _selectedIndex = 1;
+              //       print('Halaman Nama Akun');
+              //     });
+              //   }, 
+              //   icon: Icon(
+              //     Icons.category_outlined,
+              //     color: _selectedIndex == 1 ? Colors.black : Colors.white,
+              //   ),
+              //   iconSize: 30,
+              // ),
               IconButton(
                 onPressed: () {
                   selectedPage[1];
                   setState(() {
                     _selectedIndex = 1;
-                    print('Halaman Nama Akun');
-                  });
-                }, 
-                icon: Icon(
-                  Icons.category_outlined,
-                  color: _selectedIndex == 1 ? Colors.black : Colors.white,
-                ),
-                iconSize: 30,
-              ),
-              IconButton(
-                onPressed: () {
-                  selectedPage[2];
-                  setState(() {
-                    _selectedIndex = 2;
                     print('Halaman Profil');
                   });
                 }, 
                 icon: Icon(
                   Icons.person,
-                  color: _selectedIndex == 2 ? Colors.black : Colors.white,
+                  color: _selectedIndex == 1 ? Colors.black : Colors.white,
                 ),
                 iconSize: 30,
               ),
@@ -254,15 +285,4 @@ class karyawanPageState extends State<karyawanPage>{
       ),
     );
   }
-}
-
-void Logout(BuildContext context) {
-  final scaffold = ScaffoldMessenger.of(context);
-  scaffold.showSnackBar(
-    SnackBar(
-      content: Text("Anda berhasil logout!"),
-      action:
-          SnackBarAction(label: 'OK', onPressed: scaffold.hideCurrentSnackBar),
-    ),
-  );
 }

@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'package:aplikasi_keuangan/adminPages/adminPage.dart';
-import 'package:aplikasi_keuangan/karyawanPages/inputKaryawan.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -16,6 +14,27 @@ class _transaksiKaryawanState extends State<transaksiKaryawan> {
   List<dynamic> dataTransaksi = [];
   List<dynamic> sortedDates = [];
   List<String> distinctMonthAndYear = [];
+  List<dynamic> searchResults = [];
+
+  TextEditingController search = TextEditingController();
+
+  void searchData(String keyword) {
+    setState(() {
+      searchResults = dataTransaksi.where((transaction) {
+        String kategori = transaction['kategori'];
+        String keterangan = transaction['keterangan'];
+        return kategori.toLowerCase().contains(keyword.toLowerCase()) ||
+          keterangan.toLowerCase().contains(keyword.toLowerCase());
+      }).toList();
+    });
+  }
+
+  // void clearSearch() {
+  //   setState(() {
+  //     search.text = '';
+  //     searchResults = [];
+  //   });
+  // }
 
   @override
   void initState() {
@@ -133,7 +152,8 @@ class _transaksiKaryawanState extends State<transaksiKaryawan> {
               );
             }).toList(),
             indicator: UnderlineTabIndicator(
-                borderSide: BorderSide(color: Colors.blue, width: 4)),
+              borderSide: BorderSide(color: Colors.blue, width: 4)
+            ),
           ),
           body: Padding(
             padding: EdgeInsets.fromLTRB(16, 16, 16, 30),
@@ -166,8 +186,6 @@ class _transaksiKaryawanState extends State<transaksiKaryawan> {
 
                 int PemasukanTotal = 0;
                 int PengeluaranTotal = 0;
-                int kasHarian = PemasukanTotal-PengeluaranTotal;
-                
 
                 for (int i = 0; i < transactions.length; i++) {
                   String nilaiTransaksiString =
@@ -189,6 +207,50 @@ class _transaksiKaryawanState extends State<transaksiKaryawan> {
 
                 return Column(
                   children: <Widget>[
+                    Column(
+                      children: <Widget>[
+                        Material(
+                          elevation: 2,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(30)
+                          ),
+                          child: TextField(
+                            controller: search,
+                            onChanged: searchData,
+                            cursorColor: Colors.blue,
+                            //style: DropdownMenuItem,
+                            decoration: InputDecoration(
+                              hintText: 'Cari Transaksi',
+                              hintStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12
+                              ),
+                              prefixIcon: Material(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30)
+                                ),
+                                child: Icon(
+                                  Icons.search,
+                                  //color: Colors.black,
+                                ),
+                              ),
+                              //border: InputBorder.none,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30)
+                                ),
+                                borderSide: BorderSide(width: 0.5),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 25,
+                                vertical: 13
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 10,),
                     // Box total pemasukan dan pengeluaran
                     Card(
                         elevation: 2.0,
@@ -249,13 +311,21 @@ class _transaksiKaryawanState extends State<transaksiKaryawan> {
                           ],
                         )),
 
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
                     Expanded(
                       child: ListView.separated(
                         itemCount: groupedTransactions.length,
                         itemBuilder: (context, index) {
                           String date = groupedTransactions.keys.elementAt(index);
-                          List<dynamic> transactions = groupedTransactions.values.elementAt(index);                       
+                          List<dynamic> transactions = groupedTransactions.values.elementAt(index);   
+                          if (search.text.isNotEmpty) {
+                            transactions = transactions.where((transaction) {
+                              String kategori = transaction['kategori'];
+                              String keterangan = transaction['keterangan'];
+                              return kategori.toLowerCase().contains(search.text.toLowerCase()) ||
+                                  keterangan.toLowerCase().contains(search.text.toLowerCase());
+                            }).toList();
+                          }                    
                           return Card(
                             margin: EdgeInsets.symmetric(vertical: 2.0),
                             elevation: 2,
@@ -272,6 +342,7 @@ class _transaksiKaryawanState extends State<transaksiKaryawan> {
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 14,
+                                            color: Color.fromARGB(255, 37, 22, 179)
                                           ),
                                           textAlign: TextAlign.left,
                                         ),
@@ -359,17 +430,17 @@ class _transaksiKaryawanState extends State<transaksiKaryawan> {
               }).toList(),
             ),
           ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-          floatingActionButton: FloatingActionButton(
-              backgroundColor: Colors.blue,
-              child: Icon(Icons.add_box, color: Colors.white),
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => inputKaryawan(level: 'karyawan'))
-                );
-              }
-          ),
+          // floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+          // floatingActionButton: FloatingActionButton(
+          //     backgroundColor: Colors.blue,
+          //     child: Icon(Icons.add_box, color: Colors.white),
+          //     onPressed: () {
+          //       Navigator.pushReplacement(
+          //         context,
+          //         MaterialPageRoute(builder: (context) => inputKaryawan(level: 'karyawan'))
+          //       );
+          //     }
+          // ),
         ),
       );
     }

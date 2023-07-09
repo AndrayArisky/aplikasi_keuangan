@@ -32,7 +32,7 @@ dependencies:
   flutter:
     sdk: flutter
   fluttertoast: null
-  http: ^0.13.4
+  http: ^1.1.0
   intl: ^0.17.0
   path_provider: ^2.0.15
   pdf: ^3.10.4

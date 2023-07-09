@@ -18,7 +18,9 @@ class _profilAdminState extends State<profilAdmin>{
   }
 
   Future<void> fetchData() async {
-    final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getdata.php'));
+    final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getUser.php?'));
+    print(response.statusCode); // Periksa kode status HTTP
+    //print(response.body); // Periksa respons body
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       final user = jsonData.where((data) => data['level'] == 'admin').toList();
@@ -32,7 +34,6 @@ class _profilAdminState extends State<profilAdmin>{
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
     extendBodyBehindAppBar: true,
     extendBody: true,
@@ -46,8 +47,9 @@ class _profilAdminState extends State<profilAdmin>{
                 crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
+                      'usaha',
                       //title,
-                      'bbb',
+                      //'${Data[0]['usaha']}',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -55,8 +57,9 @@ class _profilAdminState extends State<profilAdmin>{
                     ),
                     SizedBox(height: 5),
                     Text(
+                      'usaha',
                       //subtitle,
-                      'yyy',
+                      //'${Data[0]['alamat']}',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.black,
@@ -64,10 +67,10 @@ class _profilAdminState extends State<profilAdmin>{
                     ),
                   ],
                 ),
-            ),
+              ),
             ),
             SizedBox(height: 10,),
-            adminInfo(Data: Data),
+            adminInfo(),
           ],
         ),
       ),
@@ -76,9 +79,7 @@ class _profilAdminState extends State<profilAdmin>{
 }
 
 class adminInfo extends StatelessWidget {
-  final List<dynamic> Data;
-  const adminInfo({super.key, required this.Data});
-
+  //List<dynamic> Data = [];
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -93,18 +94,18 @@ class adminInfo extends StatelessWidget {
               ),
               textAlign: TextAlign.left,
             ),
-            trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                IconButton(
-                  onPressed: () {}, 
-                  icon: Icon(
-                    Icons.edit,
-                    color: Colors.black,
-                  ), 
-                )
-              ],
-            )
+            // trailing: Row(
+            // mainAxisSize: MainAxisSize.min,
+            //   children: <Widget>[
+            //     IconButton(
+            //       onPressed: () {}, 
+            //       icon: Icon(
+            //         Icons.edit,
+            //         color: Colors.black,
+            //       ), 
+            //     )
+            //   ],
+            // )
           ),
 
           Card(
@@ -125,35 +126,18 @@ class adminInfo extends StatelessWidget {
                             ),
                             leading: Icon(Icons.person),
                             title: Text("Nama Pemilik Usaha"),
-                            subtitle: Text(Data.isNotEmpty ? Data[0]['nama'] : ''),
+                            //subtitle: Text('${Data[0]['nama']}'),
                           ),
                           ListTile(
                             leading: Icon(Icons.mail_outlined),
                             title: Text("Email"),
-                            subtitle: Text(Data.isNotEmpty ? Data[0]['email'] : ''),
+                            //subtitle: Text('${Data[0]['email']}'),
                           ),
                           ListTile(
                             leading: Icon(Icons.phone),
                             title: Text("No. HP/Telp"),
-                            subtitle: Text('nohp'),
+                            //subtitle: Text('${Data[0]['nohp']}'),
                           ),
-                          // ListTile(
-                          //   leading: Icon(Icons.business_rounded),
-                          //   title: Text("Bidang Usaha"),
-                          //   subtitle: Text("Andray"
-                          //   ),
-                          // ),
-                          // ListTile(
-                          //   leading: Icon(
-                          //     Icons.format_list_numbered_sharp
-                          //   ),
-                          //   title: Text(
-                          //     "NPWP Usaha"
-                          //   ),
-                          //   subtitle: Text(
-                          //     "Andray"
-                          //   ),
-                          // )
                         ]
                       )
                     ],
@@ -166,7 +150,6 @@ class adminInfo extends StatelessWidget {
       ),
     );
   }
-
 }
 
 // class ProfilHeader extends StatelessWidget {
