@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
       //home: MyWidget(),
       initialRoute: '/',
       routes: {
-        '/editAnggota': (context) => editAnggota(level: 'admin', id_user: 1,),
+        '/editAnggota': (context) => editAnggota(level: 'admin'),
         '/dataAnggota': (context) => dataAnggota(),
         //'/editTransaksi': (context) => editTransaksi(level: 'admin')
       },

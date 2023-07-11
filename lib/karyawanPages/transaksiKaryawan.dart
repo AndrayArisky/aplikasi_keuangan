@@ -225,13 +225,17 @@ class _transaksiKaryawanState extends State<transaksiKaryawan> {
                                 color: Colors.black,
                                 fontSize: 12
                               ),
-                              prefixIcon: Material(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(30)
-                                ),
-                                child: Icon(
-                                  Icons.search,
-                                  //color: Colors.black,
+                              prefixIcon: Padding(
+                                padding: const EdgeInsets.only(left: 5),
+                                child: Material(
+                                  //color: Colors. grey,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(30)
+                                  ),
+                                  child: Icon(
+                                    Icons.search,
+                                    //color: Colors.black,
+                                  ),
                                 ),
                               ),
                               //border: InputBorder.none,

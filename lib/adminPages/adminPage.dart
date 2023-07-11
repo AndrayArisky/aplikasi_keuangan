@@ -107,7 +107,7 @@ class _adminPageState extends State<adminPage>{
             ),
             _drawerItem(
               icon: Icons.people_alt_rounded,
-              text: 'Data Karyawan',
+              text: 'Data Anggota',
               onTap: () {
                 var data;
                 Navigator.of(context).push (

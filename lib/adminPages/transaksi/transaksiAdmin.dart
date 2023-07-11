@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:aplikasi_keuangan/adminPages/transaksi/inputAdmin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -216,16 +217,19 @@ class _transaksiAdminState extends State<transaksiAdmin> {
                             decoration: InputDecoration(
                               hintText: 'Cari Transaksi',
                               hintStyle: TextStyle(
-                                color: Colors.black,
+                                color: Colors.grey,
                                 fontSize: 12
                               ),
-                              prefixIcon: Material(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(30)
-                                ),
-                                child: Icon(
-                                  Icons.search,
-                                  //color: Colors.black,
+                              prefixIcon: Padding(
+                                padding: const EdgeInsets.only(left: 5),
+                                child: Material(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(30)
+                                  ),
+                                  child: Icon(
+                                    Icons.search,
+                                    //color: Colors.black,
+                                  ),
                                 ),
                               ),
                               //border: InputBorder.none,
@@ -236,7 +240,7 @@ class _transaksiAdminState extends State<transaksiAdmin> {
                                 borderSide: BorderSide(width: 0.5),
                               ),
                               contentPadding: EdgeInsets.symmetric(
-                                horizontal: 25,
+                                horizontal: 30,
                                 vertical: 13
                               ),
                             ),
@@ -319,7 +323,7 @@ class _transaksiAdminState extends State<transaksiAdmin> {
                               String kategori = transaction['kategori'];
                               String keterangan = transaction['keterangan'];
                               return kategori.toLowerCase().contains(search.text.toLowerCase()) ||
-                                  keterangan.toLowerCase().contains(search.text.toLowerCase());
+                                keterangan.toLowerCase().contains(search.text.toLowerCase());
                             }).toList();
                           }                       
                           return Card(
@@ -448,7 +452,7 @@ class _transaksiAdminState extends State<transaksiAdmin> {
           //     onPressed: () {
           //       Navigator.pushReplacement(
           //         context,
-          //         MaterialPageRoute(builder: (context) => inputAdmin(id_user: 11))
+          //         MaterialPageRoute(builder: (context) => inputAdmin(level: 'admin',))
           //       );
           //     }
           // ),

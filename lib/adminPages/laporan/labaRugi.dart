@@ -1,27 +1,36 @@
 // import 'dart:convert';
+// import 'dart:io';
 // import 'package:flutter/material.dart';
 // import 'package:intl/intl.dart';
 // import 'package:http/http.dart' as http;
 // import 'package:intl/date_symbol_data_local.dart';
+// import 'package:path_provider/path_provider.dart';
+// import 'package:pdf/widgets.dart' as pw;
+// import 'package:printing/printing.dart';
+// import 'package:flutter/services.dart' show rootBundle;
+// import 'package:pdf/pdf.dart';
 
 // class labaRugi extends StatefulWidget {
 //   @override
 //   _labaRugiState createState() => _labaRugiState();
 // }
 
-// class _labaRugiState extends State<labaRugi> {
+// class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin {
 //   List<dynamic> dataTransaksi = [];
 //   List<dynamic> sortedDates = [];
 //   List<String> distinctMonthAndYear = [];
+//   late TabController _tabController;
 
 //   @override
 //   void initState() {
 //     super.initState();
+//     _tabController = TabController(length: distinctMonthAndYear.length, vsync: this);
 //     fetchData();
 //   }
 
 //   void fetchData() async {
-//     final response = await http.get(Uri.parse('http://apkeu2023.000webhostapp.com/getTransaksi.php'));
+//     final response = await http
+//         .get(Uri.parse('http://apkeu2023.000webhostapp.com/getTransaksi.php'));
 //     if (response.statusCode == 200) {
 //       setState(() {
 //         dataTransaksi = json.decode(response.body);
@@ -54,7 +63,8 @@
 //       DateTime dateTime = sortedDates[i];
 //       var formatBulan = DateFormat.MMM();
 //       String namaBulan = formatBulan.format(dateTime);
-//       String monthAndYear = "$namaBulan ${dateTime.year.toString().substring(2)}";
+//       String monthAndYear =
+//           "$namaBulan ${dateTime.year.toString().substring(2)}";
 //       if (!distinctMonthAndYear.contains(monthAndYear)) {
 //         bool bulanPunyaData = false;
 //         for (var j = 0; j < dataTransaksi.length; j++) {
@@ -62,7 +72,8 @@
 //           DateTime dateTime = DateTime.parse(tglTransaksi);
 //           var formatBulan = DateFormat.MMM();
 //           String namaBulan = formatBulan.format(dateTime);
-//           String monthAndYearTransaction = "$namaBulan ${dateTime.year.toString().substring(2)}";
+//           String monthAndYearTransaction =
+//               "$namaBulan ${dateTime.year.toString().substring(2)}";
 //           if (monthAndYearTransaction == monthAndYear) {
 //             bulanPunyaData = true;
 //             break;
@@ -90,6 +101,14 @@
 //       return Scaffold(
 //         appBar: AppBar(
 //           title: Text('Laporan Laba Rugi'),
+//           actions: [
+//             IconButton(
+//               icon: Icon(Icons.picture_as_pdf_rounded),
+//               onPressed: () {
+//                 cetakPdf(distinctMonthAndYear[_tabController.index]);
+//               },
+//             ),
+//           ],
 //         ),
 //         body: Center(
 //           child: Text(
@@ -109,6 +128,14 @@
 //         child: Scaffold(
 //           appBar: AppBar(
 //             title: Text('Laporan Laba Rugi'),
+//             actions: [
+//               IconButton(
+//                 icon: Icon(Icons.picture_as_pdf_rounded),
+//                 onPressed: () {
+//                   cetakPdf(distinctMonthAndYear[_tabController.index]);
+//                 },
+//               ),
+//             ],
 //           ),
 //           body: Column(
 //             children: [
@@ -130,22 +157,21 @@
 //                       );
 //                     }).toList(),
 //                     indicator: UnderlineTabIndicator(
-//                       borderSide: BorderSide(
-//                         color: Colors.blue, 
-//                         width: 4
-//                       )
-//                     ),
+//                         borderSide: BorderSide(color: Colors.blue, width: 4)),
 //                   ),
 //                 ),
 //               ),
 //               Expanded(
 //                 child: TabBarView(
 //                   children: distinctMonthAndYear.map((monthAndYear) {
-//                     List<dynamic> transactions = dataTransaksi.where((transaction) {
-//                       DateTime dateTime = DateTime.parse(transaction['tgl_transaksi']);
+//                     List<dynamic> transactions =
+//                         dataTransaksi.where((transaction) {
+//                       DateTime dateTime =
+//                           DateTime.parse(transaction['tgl_transaksi']);
 //                       var formatBulan = DateFormat.MMM();
 //                       String namaBulan = formatBulan.format(dateTime);
-//                       String monthAndYearTransaction = "$namaBulan ${dateTime.year.toString().substring(2)}";
+//                       String monthAndYearTransaction =
+//                           "$namaBulan ${dateTime.year.toString().substring(2)}";
 //                       return monthAndYearTransaction == monthAndYear;
 //                     }).toList();
 
@@ -154,12 +180,17 @@
 
 //                     transactions.forEach((transaction) {
 //                       String namaTransaksi = transaction['kategori'];
-//                       int nilaiTransaksi = int.parse(transaction['nominal'].toString());
+//                       int nilaiTransaksi =
+//                           int.parse(transaction['nominal'].toString());
 //                       String status = transaction['status'];
 //                       if (status == 'Pemasukan') {
-//                         totalPendapatan[namaTransaksi] = (totalPendapatan[namaTransaksi] ?? 0) + nilaiTransaksi;
+//                         totalPendapatan[namaTransaksi] =
+//                             (totalPendapatan[namaTransaksi] ?? 0) +
+//                                 nilaiTransaksi;
 //                       } else if (status == 'Pengeluaran') {
-//                         totalPengeluaran[namaTransaksi] = (totalPengeluaran[namaTransaksi] ?? 0) + nilaiTransaksi;
+//                         totalPengeluaran[namaTransaksi] =
+//                             (totalPengeluaran[namaTransaksi] ?? 0) +
+//                                 nilaiTransaksi;
 //                       }
 //                     });
 
@@ -171,21 +202,32 @@
 //                           children: <Widget>[
 //                             _buildItemRow('Pendapatan'),
 //                             SizedBox(height: 10.0),
-//                             ...totalPendapatan.entries.map((entry) => _buildAkunRow(entry.key, entry.value.toString())).toList(),
+//                             ...totalPendapatan.entries
+//                                 .map((entry) => _buildAkunRow(
+//                                     entry.key, entry.value.toString()))
+//                                 .toList(),
 //                             Divider(),
-//                             _buildTotalRow('Total Pendapatan', '${rupiah.format(totalPendapatan.values.fold(0, (a, b) => a + b))}'),
+//                             _buildTotalRow('Total Pendapatan',
+//                                 '${rupiah.format(totalPendapatan.values.fold(0, (a, b) => a + b))}'),
 //                             Divider(),
 //                             SizedBox(height: 20.0),
 //                             _buildItemRow('Biaya/Beban'),
 //                             SizedBox(height: 10.0),
-//                             ...totalPengeluaran.entries.map((entry) => _buildAkunRow(entry.key, entry.value.toString())).toList(),
+//                             ...totalPengeluaran.entries
+//                                 .map((entry) => _buildAkunRow(
+//                                     entry.key, entry.value.toString()))
+//                                 .toList(),
 //                             Divider(),
-//                             _buildTotalRow('Total Biaya/Beban', '${rupiah.format(totalPengeluaran.values.fold(0, (a, b) => a + b))}'),
+//                             _buildTotalRow('Total Biaya/Beban',
+//                                 '${rupiah.format(totalPengeluaran.values.fold(0, (a, b) => a + b))}'),
 //                             Divider(),
 //                             SizedBox(height: 40.0),
-//                             _buildTotalRow('Total Laba(Rugi) Sebelum Pajak', '${rupiah.format(totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b))}'),
-//                             _buildTotalRow('Biaya Pajak Penghasilan', '${rupiah.format(0.04 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b)))}'),
-//                             _buildTotalRow('Total Laba(Rugi) Setelah Pajak', '${rupiah.format((totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b)) - (0.04 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b))))}'),
+//                             _buildTotalRow('Total Laba(Rugi) Sebelum Pajak',
+//                                 '${rupiah.format(totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b))}'),
+//                             _buildTotalRow('Biaya Pajak Penghasilan',
+//                                 '${rupiah.format(0.04 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b)))}'),
+//                             _buildTotalRow('Total Laba(Rugi) Setelah Pajak',
+//                                 '${rupiah.format((totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b)) - (0.04 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b))))}'),
 //                           ],
 //                         ),
 //                       ),
@@ -246,4 +288,235 @@
 //       ],
 //     );
 //   }
+
+//   Future<void> cetakPdf(selectedMonth) async {
+//     final pdf = pw.Document();
+
+
+//       List<dynamic> transactions = dataTransaksi.where((transaction) {
+//         DateTime dateTime = DateTime.parse(transaction['tgl_transaksi']);
+//         var formatBulan = DateFormat.MMM();
+//         String namaBulan = formatBulan.format(dateTime);
+//         String monthAndYearTransaction = "$namaBulan ${dateTime.year.toString().substring(2)}";
+//         return monthAndYearTransaction == selectedMonth;
+//       }).toList();
+
+//       Map<String, int> totalPendapatan = {};
+//       Map<String, int> totalPengeluaran = {};
+
+//       transactions.forEach((transaction) {
+//         String namaTransaksi = transaction['kategori'];
+//         int nilaiTransaksi = int.parse(transaction['nominal'].toString());
+//         String status = transaction['status'];
+//         if (status == 'Pemasukan') {
+//           totalPendapatan[namaTransaksi] = (totalPendapatan[namaTransaksi] ?? 0) + nilaiTransaksi;
+//         } else if (status == 'Pengeluaran') {
+//           totalPengeluaran[namaTransaksi] = (totalPengeluaran[namaTransaksi] ?? 0) + nilaiTransaksi;
+//         }
+//       });
+
+//       pdf.addPage(
+//         pw.MultiPage(
+//           header: (pw.Context context) {
+//             return pw.Header(
+//               level: 0,
+//               child: pw.Text(
+//                 'Laporan Laba Rugi\n$selectedMonth',
+//                 style: pw.TextStyle(
+//                   fontSize: 20,
+//                   fontWeight: pw.FontWeight.bold
+//                 ),
+//               ),
+//             );
+//           },
+//           build: (pw.Context context) {
+//             final tablePendapatan = pw.Table(
+//               //border: pw.TableBorder.all(),
+//               children: [
+//                 pw.TableRow(
+//                   children: [
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(right: 8),
+//                       child: pw.Text('Nama Akun', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+//                     ),
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(left: 8),
+//                       alignment: pw.Alignment.centerRight,
+//                       child: pw.Text('Nilai', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+//                     )
+//                   ],
+//                 ),
+//                 ...totalPendapatan.entries.map((entry) => pw.TableRow(
+//                   children: [
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(right: 8),
+//                       child: pw.Text(entry.key),
+//                     ),
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(left: 8),
+//                       alignment: pw.Alignment.centerRight,
+//                       child: pw.Text(rupiah.format(entry.value)),
+//                     ),
+//                   ]
+//                 )),
+//                 pw.TableRow(
+//                   children: [
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(right: 8),
+//                       child: pw.Text('Total Pendapatan', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+//                     ),
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(left: 8),
+//                       alignment: pw.Alignment.centerRight,
+//                       child: pw.Text(rupiah.format(totalPendapatan.values.fold(0, (a, b) => a + b)), style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+//                     )                  
+//                   ],
+//                 ),
+//               ],
+//             );
+
+//             final tableBiayaBeban = pw.Table(
+//               //border: pw.TableBorder.all(),
+//               children: [
+//                 pw.TableRow(
+//                   children: [
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(right: 8),
+//                       child: pw.Text('Nama Akun', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+//                     ),
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(left: 8),
+//                       alignment: pw.Alignment.centerRight,
+//                       child: pw.Text('Nilai', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+//                     )      
+//                   ],
+//                 ),
+//                 ...totalPengeluaran.entries.map((entry) => pw.TableRow(
+//                   children: [
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(right: 8),
+//                       child: pw.Text(entry.key),
+//                     ),
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(left: 8),
+//                       alignment: pw.Alignment.centerRight,
+//                       child: pw.Text(rupiah.format(entry.value)),
+//                     )      
+//                   ],
+//                 )),
+//                 pw.TableRow(
+//                   children: [
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(right: 8),
+//                       child: pw.Text('Total Pengeluaran', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+//                     ),
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(left: 8),
+//                       alignment: pw.Alignment.centerRight,
+//                       child: pw.Text(rupiah.format(totalPengeluaran.values.fold(0, (a, b) => a + b)), style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+//                     )  
+//                   ],
+//                 ),
+//               ],
+//             );
+
+//             final tableTotalLabaRugi = pw.Table(
+//               //border: pw.TableBorder.all(),
+//               columnWidths: {
+//                 0: pw.FlexColumnWidth(),
+//                 1: pw.FlexColumnWidth(),
+//               },
+//               children: [
+//                 pw.TableRow(
+//                   children: [
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(right: 8),
+//                       child: pw.Text(''),
+//                     ),
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(left: 8),
+//                       alignment: pw.Alignment.centerRight,
+//                       child: pw.Text('Nilai', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+//                     )                 
+//                   ],
+//                 ),
+//                 pw.TableRow(
+//                   children: [
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(right: 8),
+//                       child: pw.Text('Sebelum Pajak'),
+//                     ),
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(left: 8),
+//                       alignment: pw.Alignment.centerRight,
+//                       child: pw.Text(rupiah.format(totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b))), 
+//                     )                    
+//                   ],
+//                 ),
+//                 pw.TableRow(
+//                   children: [
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(right: 8),
+//                       child: pw.Text('Biaya Pajak Penghasilan'),
+//                     ),
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(left: 8),
+//                       alignment: pw.Alignment.centerRight,
+//                       child: pw.Text(rupiah.format(0.04 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b)))),
+//                     ) 
+//                   ],
+//                 ),
+//                 pw.TableRow(
+//                   children: [
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(right: 8),
+//                       child: pw.Text('Setelah Pajak'),
+//                     ),
+//                     pw.Container(
+//                       padding: pw.EdgeInsets.only(left: 8),
+//                       alignment: pw.Alignment.centerRight,
+//                       child: pw.Text(rupiah.format((totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b)) - (0.04 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b))))),
+//                     )          
+//                   ],
+//                 ),
+//               ],
+//             );
+
+//             return <pw.Widget>[
+//               pw.Header(
+//                 level: 2,
+//                 child: pw.Text('Pendapatan', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 15)),
+//               ),
+//               tablePendapatan,
+//               pw.SizedBox(height: 15),
+//               pw.Header(
+//                 level: 2,
+//                 child: pw.Text('Biaya/Beban', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 15)),
+//               ),
+//               tableBiayaBeban,
+//               pw.SizedBox(height: 15),
+//               pw.Header(
+//                 level: 2,
+//                 child: pw.Text('Total Laba (Rugi)', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 15)),
+//               ),
+//               tableTotalLabaRugi,
+//             ];
+//           },
+//         ),
+//       );
+    
+
+//       final outputDir = await getTemporaryDirectory();
+//       final filePath = '${outputDir.path}/laporan_laba_rugi.pdf';
+
+//       final pdfBytes = await pdf.save();
+//       final pdfFile = File(filePath);
+//       await pdfFile.writeAsBytes(pdfBytes);
+
+//       await Printing.sharePdf(
+//         bytes: await pdfFile.readAsBytes(),
+//         filename: 'laporan_laba_rugi.pdf',
+//       );
+//   }
 // }
+

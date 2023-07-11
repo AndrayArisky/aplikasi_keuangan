@@ -8,20 +8,23 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:pdf/pdf.dart';
 
 class labaRugi extends StatefulWidget {
   @override
   _labaRugiState createState() => _labaRugiState();
 }
 
-class _labaRugiState extends State<labaRugi> {
+class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin {
   List<dynamic> dataTransaksi = [];
   List<dynamic> sortedDates = [];
   List<String> distinctMonthAndYear = [];
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: distinctMonthAndYear.length, vsync: this);
     fetchData();
   }
 
@@ -102,7 +105,7 @@ class _labaRugiState extends State<labaRugi> {
             IconButton(
               icon: Icon(Icons.picture_as_pdf_rounded),
               onPressed: () {
-                cetakPdf();
+                cetakPdf(distinctMonthAndYear[_tabController.index]);
               },
             ),
           ],
@@ -129,7 +132,7 @@ class _labaRugiState extends State<labaRugi> {
               IconButton(
                 icon: Icon(Icons.picture_as_pdf_rounded),
                 onPressed: () {
-                  cetakPdf();
+                  cetakPdf(distinctMonthAndYear[_tabController.index]);
                 },
               ),
             ],
@@ -286,20 +289,16 @@ class _labaRugiState extends State<labaRugi> {
     );
   }
 
-  Future<void> cetakPdf() async {
+  Future<void> cetakPdf(selectedMonth) async {
     final pdf = pw.Document();
 
-    List<String> distinctMonthAndYear = _getDistinctMonthAndYear();
-    List<dynamic> dataTransaksi = []; // Inisialisasi dataTransaksi sesuai dengan kebutuhan
 
-    for (var i = 0; i < distinctMonthAndYear.length; i++) {
-      final monthAndYear = distinctMonthAndYear[i];
       List<dynamic> transactions = dataTransaksi.where((transaction) {
         DateTime dateTime = DateTime.parse(transaction['tgl_transaksi']);
         var formatBulan = DateFormat.MMM();
         String namaBulan = formatBulan.format(dateTime);
         String monthAndYearTransaction = "$namaBulan ${dateTime.year.toString().substring(2)}";
-        return monthAndYearTransaction == monthAndYear;
+        return monthAndYearTransaction == selectedMonth;
       }).toList();
 
       Map<String, int> totalPendapatan = {};
@@ -315,61 +314,114 @@ class _labaRugiState extends State<labaRugi> {
           totalPengeluaran[namaTransaksi] = (totalPengeluaran[namaTransaksi] ?? 0) + nilaiTransaksi;
         }
       });
-      
-  for (String monthAndYear in distinctMonthAndYear)
+
       pdf.addPage(
         pw.MultiPage(
+          header: (pw.Context context) {
+            return pw.Header(
+              level: 0,
+              child: pw.Text(
+                'Laporan Laba Rugi\n$selectedMonth',
+                style: pw.TextStyle(
+                  fontSize: 20,
+                  fontWeight: pw.FontWeight.bold
+                ),
+              ),
+            );
+          },
           build: (pw.Context context) {
             final tablePendapatan = pw.Table(
-              border: pw.TableBorder.all(),
+              //border: pw.TableBorder.all(),
               children: [
                 pw.TableRow(
                   children: [
-                    pw.Text('Nama Akun', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    pw.Text('Nilai', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(right: 8),
+                      child: pw.Text('Nama Akun', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(left: 8),
+                      alignment: pw.Alignment.centerRight,
+                      child: pw.Text('Nilai', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    )
                   ],
                 ),
                 ...totalPendapatan.entries.map((entry) => pw.TableRow(
                   children: [
-                    pw.Text(entry.key),
-                    pw.Text(rupiah.format(entry.value)),
-                  ],
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(right: 8),
+                      child: pw.Text(entry.key),
+                    ),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(left: 8),
+                      alignment: pw.Alignment.centerRight,
+                      child: pw.Text(rupiah.format(entry.value)),
+                    ),
+                  ]
                 )),
                 pw.TableRow(
                   children: [
-                    pw.Text('Total Pendapatan', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    pw.Text(rupiah.format(totalPendapatan.values.fold(0, (a, b) => a + b)), style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(right: 8),
+                      child: pw.Text('Total Pendapatan', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(left: 8),
+                      alignment: pw.Alignment.centerRight,
+                      child: pw.Text(rupiah.format(totalPendapatan.values.fold(0, (a, b) => a + b)), style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    )                  
                   ],
                 ),
               ],
             );
 
             final tableBiayaBeban = pw.Table(
-              border: pw.TableBorder.all(),
+              //border: pw.TableBorder.all(),
               children: [
                 pw.TableRow(
                   children: [
-                    pw.Text('Nama Akun', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    pw.Text('Nilai', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(right: 8),
+                      child: pw.Text('Nama Akun', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(left: 8),
+                      alignment: pw.Alignment.centerRight,
+                      child: pw.Text('Nilai', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    )      
                   ],
                 ),
                 ...totalPengeluaran.entries.map((entry) => pw.TableRow(
                   children: [
-                    pw.Text(entry.key),
-                    pw.Text(rupiah.format(entry.value)),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(right: 8),
+                      child: pw.Text(entry.key),
+                    ),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(left: 8),
+                      alignment: pw.Alignment.centerRight,
+                      child: pw.Text(rupiah.format(entry.value)),
+                    )      
                   ],
                 )),
                 pw.TableRow(
                   children: [
-                    pw.Text('Total Peneluaran', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    pw.Text(rupiah.format(totalPengeluaran.values.fold(0, (a, b) => a + b)), style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(right: 8),
+                      child: pw.Text('Total Pengeluaran', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(left: 8),
+                      alignment: pw.Alignment.centerRight,
+                      child: pw.Text(rupiah.format(totalPengeluaran.values.fold(0, (a, b) => a + b)), style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    )  
                   ],
                 ),
               ],
             );
 
             final tableTotalLabaRugi = pw.Table(
-              border: pw.TableBorder.all(),
+              //border: pw.TableBorder.all(),
               columnWidths: {
                 0: pw.FlexColumnWidth(),
                 1: pw.FlexColumnWidth(),
@@ -377,59 +429,82 @@ class _labaRugiState extends State<labaRugi> {
               children: [
                 pw.TableRow(
                   children: [
-                    pw.Text('Nama', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    pw.Text('Nilai', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(right: 8),
+                      child: pw.Text(''),
+                    ),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(left: 8),
+                      alignment: pw.Alignment.centerRight,
+                      child: pw.Text('Nilai', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    )                 
                   ],
                 ),
                 pw.TableRow(
                   children: [
-                    pw.Text('Sebelum Pajak'),
-                    pw.Text(rupiah.format(totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b))),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(right: 8),
+                      child: pw.Text('Total Laba (Rugi) Sebelum Pajak', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(left: 8),
+                      alignment: pw.Alignment.centerRight,
+                      child: pw.Text(rupiah.format(totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b)), style: pw.TextStyle(fontWeight: pw.FontWeight.bold)), 
+                    )                    
                   ],
                 ),
                 pw.TableRow(
                   children: [
-                    pw.Text('Biaya Pajak Penghasilan'),
-                    pw.Text(rupiah.format(0.04 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b)))),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(right: 8),
+                      child: pw.Text('Biaya Pajak Penghasilan', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(left: 8),
+                      alignment: pw.Alignment.centerRight,
+                      child: pw.Text(rupiah.format(0.04 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b))), style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ) 
                   ],
                 ),
                 pw.TableRow(
                   children: [
-                    pw.Text('Setelah Pajak'),
-                    pw.Text(rupiah.format((totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b)) - (0.04 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b))))),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(right: 8),
+                      child: pw.Text('Total Laba (Rugi) Setelah Pajak', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(left: 8),
+                      alignment: pw.Alignment.centerRight,
+                      child: pw.Text(rupiah.format((totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b)) - (0.04 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b)))), style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    )          
                   ],
                 ),
               ],
             );
 
-
-             return [
-              pw.Center(
-                child: pw.Text('Laporan Laba Rugi'),
-              ),
-              pw.SizedBox(height: 20),
+            return <pw.Widget>[
               pw.Header(
-                level: 1,
-                child: pw.Text('Pendapatan'),
+                level: 2,
+                child: pw.Text('Pendapatan', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 15)),
               ),
               tablePendapatan,
-              pw.SizedBox(height: 20),
+              pw.SizedBox(height: 15),
               pw.Header(
                 level: 2,
-                child: pw.Text('Biaya/Beban'),
+                child: pw.Text('Biaya/Beban', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 15)),
               ),
               tableBiayaBeban,
-              pw.SizedBox(height: 20),
+              pw.SizedBox(height: 15),
               pw.Header(
                 level: 2,
-                child: pw.Text('Total Laba(Rugi)'),
+                child: pw.Text('', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 15)),
               ),
               tableTotalLabaRugi,
             ];
           },
         ),
       );
-    }
+    
 
       final outputDir = await getTemporaryDirectory();
       final filePath = '${outputDir.path}/laporan_laba_rugi.pdf';
@@ -442,8 +517,6 @@ class _labaRugiState extends State<labaRugi> {
         bytes: await pdfFile.readAsBytes(),
         filename: 'laporan_laba_rugi.pdf',
       );
-    
   }
 }
-
 
