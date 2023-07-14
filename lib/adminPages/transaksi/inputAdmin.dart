@@ -15,6 +15,18 @@ class Tipe{
   });
 }
 
+class Akun {
+  final int id_akun;
+  final String nama;
+  final String tipe;
+
+  Akun({
+    required this.id_akun,
+    required this.nama,
+    required this.tipe,
+  });
+}
+
 class inputAdmin extends StatefulWidget {
   final level;
   inputAdmin({required this.level});
@@ -32,9 +44,11 @@ class inputAdminState extends State<inputAdmin> {
   String _formatNominal = '';
   String id_user = '1';
   String? selectedOption;
+  String? selectedIdAkun;
 
   List<Tipe> pemasukanData = [];
   List<Tipe> pengeluaranData = [];
+   List<Akun> akunData = [];
 
   final kategori = TextEditingController();
   final nominal = TextEditingController();
@@ -55,6 +69,22 @@ class inputAdminState extends State<inputAdmin> {
     }
   }
 
+    Future<List<Akun>> fetchAkunData() async {
+    var url = Uri.parse('http://apkeu2023.000webhostapp.com/getdata.php');
+    var response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body) as List<dynamic>;
+      return data.map((item) => Akun(
+        id_akun: int.parse(item['id_akun']),
+        nama: item['nm_akun'],
+        tipe: item['tipe'],
+      )).toList();
+    } else {
+      throw Exception('Failed to fetch tipe data');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -66,13 +96,26 @@ class inputAdminState extends State<inputAdmin> {
     }).catchError((error) {
       print('Error: $error');
     });
+
+    fetchAkunData().then((data) {
+      setState(() {
+        akunData = data;
+      });
+    }).catchError((error) {
+      print('Error: $error');
+    });
   }
 
   // FUNGSI TOMBOL SIMPAN
   void tambahTransaksi() async {
     var url = Uri.parse('http://apkeu2023.000webhostapp.com/inputdata.php');
+    var selectedAccount = akunData.firstWhere(
+      (account) => account.nama == selectedOption,
+      orElse: () => Akun(id_akun: 0, nama: '', tipe: ''),
+    );
     var body = {
       'id_user': id_user,
+      'id_akun': selectedAccount.id_akun.toString(),
       'kategori': kategori.text,
       'tgl_transaksi': selectedDate.toString(),
       'nominal': nominal.text,
@@ -296,16 +339,13 @@ class inputAdminState extends State<inputAdmin> {
             if (status == 'Pengeluaran')
             TextField(
               controller: kategori, 
+              readOnly: true,
               decoration: InputDecoration(
                 icon: Icon(Icons.category_outlined),
                 labelText: "Kategori $status",
                 suffixIcon: IconButton(
                   onPressed: () {
-                    
-                    // Lakukan sesuatu saat tombol ikon ditekan
                     _showModal(pengeluaranData);
-                    // String text = kategori.text;
-                    // print('Nilai yang dimasukkan: $text');
                   },
                   icon: Icon(Icons.add),
                 ),
@@ -314,16 +354,13 @@ class inputAdminState extends State<inputAdmin> {
             if (status == 'Pemasukan')
             TextField(
               controller: kategori, 
+              readOnly: true,
               decoration: InputDecoration(
                 icon: Icon(Icons.category_outlined),
                 labelText: "Kategori $status",
                 suffixIcon: IconButton(
-                  onPressed: () {
-                    
-                    // Lakukan sesuatu saat tombol ikon ditekan
+                  onPressed: () {                    
                     _showModal(pemasukanData);
-                    // String text = kategori.text;
-                    // print('Nilai yang dimasukkan: $text');
                   },
                   icon: Icon(Icons.add),
                 ),
@@ -393,36 +430,6 @@ class inputAdminState extends State<inputAdmin> {
                   )
               ),
             ),
-
-            // SizedBox(
-            //   height: 20.0
-            // ),
-            // Row(
-            //   children: <Widget>[
-            //     Radio(
-            //       value: 0,
-            //       groupValue: this.selected,
-            //       onChanged: (int? value) {
-            //         onChanged(value);
-            //       }
-            //     ),
-            //     Container(
-            //       width: 8.0,
-            //     ),
-            //     Text('Cash'),
-            //     Radio(
-            //       value: 1,
-            //       groupValue: this.selected,
-            //       onChanged: (int? value) {
-            //         onChanged(value);
-            //       }
-            //     ),
-            //     Container(
-            //       width: 8.0,
-            //     ),
-            //     Text('Non-cash')
-            //   ],
-            // ),
 
             SizedBox(height: 25.0),
             // TOMBOL SIMPAN

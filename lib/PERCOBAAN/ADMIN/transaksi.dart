@@ -15,15 +15,28 @@
 //   });
 // }
 
-// class EditTransaksi extends StatefulWidget {
-//   final level;
-//   EditTransaksi({required this.level});
+// class Akun {
+//   final int id_akun;
+//   final String nama;
+//   final String tipe;
 
-//   @override
-//   EditTransaksiState createState() => EditTransaksiState();
+//   Akun({
+//     required this.id_akun,
+//     required this.nama,
+//     required this.tipe,
+//   });
 // }
 
-// class EditTransaksiState extends State<EditTransaksi> {
+// class inputAdmin extends StatefulWidget {
+//   final level;
+//   inputAdmin({required this.level});
+
+//   @override
+//   inputAdminState createState() => inputAdminState();
+// }
+
+// class inputAdminState extends State<inputAdmin> {
+
 //   int? selected = -1;
 //   int selectedIndex = 2;
 //   String status = 'Pengeluaran';
@@ -31,50 +44,78 @@
 //   String _formatNominal = '';
 //   String id_user = '1';
 //   String? selectedOption;
-//   List<Map<String, dynamic>> data = [];
-//   String selectedTipe = '';
+//    String? selectedIdAkun;
+
+//   List<Tipe> pemasukanData = [];
+//   List<Tipe> pengeluaranData = [];
+//    List<Akun> akunData = [];
 
 //   final kategori = TextEditingController();
 //   final nominal = TextEditingController();
 //   final keterangan = TextEditingController();
 
-//     @override
+//   Future<List<Tipe>> fetchTipeData() async {
+//     var url = Uri.parse('http://apkeu2023.000webhostapp.com/getdata.php');
+//     var response = await http.get(url);
+
+//     if (response.statusCode == 200) {
+//       var data = json.decode(response.body) as List<dynamic>;
+//       return data.map((item) => Tipe(
+//         title: item['nm_akun'],
+//         type: item['tipe'],
+//       )).toList();
+//     } else {
+//       throw Exception('Failed to fetch tipe data');
+//     }
+//   }
+
+//     Future<List<Akun>> fetchAkunData() async {
+//     var url = Uri.parse('http://apkeu2023.000webhostapp.com/getdata.php');
+//     var response = await http.get(url);
+
+//     if (response.statusCode == 200) {
+//       var data = json.decode(response.body) as List<dynamic>;
+//       return data.map((item) => Akun(
+//         id_akun: int.parse(item['id_akun']),
+//         nama: item['nm_akun'],
+//         tipe: item['tipe'],
+//       )).toList();
+//     } else {
+//       throw Exception('Failed to fetch tipe data');
+//     }
+//   }
+
+//   @override
 //   void initState() {
 //     super.initState();
-//     fetchData();
-//   }
-
-//   Future<void> fetchData() async {
-//     final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getdata.php'));
-//     if (response.statusCode == 200) {
-//       final jsonData = json.decode(response.body);
+//     fetchTipeData().then((data) {
 //       setState(() {
-//         data = List<Map<String, dynamic>>.from(jsonData);
+//         pemasukanData = data.where((tipe) => tipe.type == 'pm').toList();
+//         pengeluaranData = data.where((tipe) => tipe.type == 'pr').toList();
 //       });
-//     } else {
-//       throw Exception('Gagal mengambil data!');
-//     }
-//   }
+//     }).catchError((error) {
+//       print('Error: $error');
+//     });
 
-//   List<Map<String, dynamic>> filterData(String tipe) {
-//     if (tipe == 'pm' || tipe == 'pr') {
-//       return data.where((item) => item['tipe'] == tipe).toList();
-//     } else {
-//       return data;
-//     }
-//   }
-
-//   void selectTipe(String tipe) {
-//     setState(() {
-//       selectedTipe = tipe;
+//     fetchAkunData().then((data) {
+//       setState(() {
+//         akunData = data;
+//       });
+//     }).catchError((error) {
+//       print('Error: $error');
 //     });
 //   }
 
 //   // FUNGSI TOMBOL SIMPAN
 //   void tambahTransaksi() async {
 //     var url = Uri.parse('http://apkeu2023.000webhostapp.com/inputdata.php');
+//     var selectedAccount = akunData.firstWhere(
+//       (account) => account.nama == selectedOption,
+//       orElse: () => Akun(id_akun: 0, nama: '', tipe: ''),
+//     );
 //     var body = {
 //       'id_user': id_user,
+//       'id_akun': selectedAccount.id_akun.toString(),
 //       'kategori': kategori.text,
 //       'tgl_transaksi': selectedDate.toString(),
 //       'nominal': nominal.text,
@@ -125,7 +166,6 @@
 //               title: Text("Gagal menyimpan data!"),
 //               content:
 //                   Text("Pastikan data yang anda input sudah benar!"),
-//               // content: Text(result["message"]),
 //               actions: <Widget>[
 //                 ElevatedButton(
 //                   child: Text("OK"),
@@ -221,7 +261,6 @@
 
 //   @override
 //   Widget build(BuildContext context) {
-//     List<Map<String, dynamic>> filteredData = filterData(selectedTipe);
 //     return Scaffold(
 //         appBar: AppBar(
 //           title: Text('Tambah Transaksi'),
@@ -239,7 +278,7 @@
 //           ),
 //         ),
 //         body: Container(
-//           padding: EdgeInsets.fromLTRB(35, 20, 20, 20),
+//           padding: EdgeInsets.all(20),
 //           child: Column(
 //             children: <Widget>[
 //             // TOMBOL PEMASUKAN DAN PENGELUARAN
@@ -300,15 +339,13 @@
 //             if (status == 'Pengeluaran')
 //             TextField(
 //               controller: kategori, 
+//               readOnly: true,
 //               decoration: InputDecoration(
 //                 icon: Icon(Icons.category_outlined),
 //                 labelText: "Kategori $status",
 //                 suffixIcon: IconButton(
 //                   onPressed: () {
-                    
-//                     _showModal(
-//                       filterData('pr').cast<Tipe>()
-//                     );
+//                     _showModal(pengeluaranData);
 //                   },
 //                   icon: Icon(Icons.add),
 //                 ),
@@ -317,14 +354,13 @@
 //             if (status == 'Pemasukan')
 //             TextField(
 //               controller: kategori, 
+//               readOnly: true,
 //               decoration: InputDecoration(
 //                 icon: Icon(Icons.category_outlined),
 //                 labelText: "Kategori $status",
 //                 suffixIcon: IconButton(
-//                   onPressed: () {  
-//                     _showModal(
-//                       filterData('pm').cast<Tipe>()
-//                     );
+//                   onPressed: () {                    
+//                     _showModal(pemasukanData);
 //                   },
 //                   icon: Icon(Icons.add),
 //                 ),
@@ -394,6 +430,7 @@
 //                   )
 //               ),
 //             ),
+
 //             SizedBox(height: 25.0),
 //             // TOMBOL SIMPAN
 //             Row(

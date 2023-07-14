@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class profilAdmin extends StatefulWidget {
 
@@ -8,13 +9,27 @@ class profilAdmin extends StatefulWidget {
   _profilAdminState createState() => _profilAdminState();
 }
 
+String? nama = "", nohp = "", email = "", usaha = "", alamat = "";
+
 class _profilAdminState extends State<profilAdmin>{
-  List<dynamic> Data = [];
+  List<String> Data = [];
+
+  getPref() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      nama = preferences.getString("nama");
+      nohp = preferences.getString("nohp");
+      email = preferences.getString("email");
+      usaha = preferences.getString("usaha");
+      alamat = preferences.getString("alamat");
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     fetchData();
+    getPref();
   }
 
   Future<void> fetchData() async {
@@ -47,7 +62,7 @@ class _profilAdminState extends State<profilAdmin>{
                 crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      'usaha',
+                      '$usaha',
                       //title,
                       //'${Data[0]['usaha']}',
                       style: TextStyle(
@@ -57,7 +72,7 @@ class _profilAdminState extends State<profilAdmin>{
                     ),
                     SizedBox(height: 5),
                     Text(
-                      'usaha',
+                      '$alamat',
                       //subtitle,
                       //'${Data[0]['alamat']}',
                       style: TextStyle(
@@ -126,18 +141,21 @@ class adminInfo extends StatelessWidget {
                             ),
                             leading: Icon(Icons.person),
                             title: Text("Nama Pemilik Usaha"),
+                            subtitle: Text('$nama'),
                             //subtitle: Text('${Data[0]['nama']}'),
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.mail_outlined),
-                            title: Text("Email"),
-                            //subtitle: Text('${Data[0]['email']}'),
                           ),
                           ListTile(
                             leading: Icon(Icons.phone),
                             title: Text("No. HP/Telp"),
+                            subtitle: Text('$nohp'),
                             //subtitle: Text('${Data[0]['nohp']}'),
                           ),
+                          ListTile(
+                            leading: Icon(Icons.mail_outlined),
+                            title: Text("Email"),
+                            subtitle: Text('$email'),
+                            //subtitle: Text('${Data[0]['email']}'),
+                          ), 
                         ]
                       )
                     ],

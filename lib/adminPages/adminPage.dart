@@ -1,4 +1,6 @@
-import 'package:aplikasi_keuangan/PERCOBAAN/test2.dart';
+import 'package:aplikasi_keuangan/PERCOBAAN/ADMIN/riwayat.dart';
+import 'package:aplikasi_keuangan/PERCOBAAN/ADMIN/transaksi.dart';
+import 'package:aplikasi_keuangan/PERCOBAAN/login.dart';
 import 'package:aplikasi_keuangan/PERCOBAAN/test6.dart';
 import 'package:aplikasi_keuangan/adminPages/anggota/dataAnggota.dart';
 import 'package:aplikasi_keuangan/adminPages/anggota/tambahAnggota.dart';
@@ -6,7 +8,6 @@ import 'package:aplikasi_keuangan/adminPages/laporan/labaRugi.dart';
 import 'package:aplikasi_keuangan/adminPages/laporan/posisiKeuangan.dart';
 import 'package:aplikasi_keuangan/adminPages/profilAdmin.dart';
 import 'package:aplikasi_keuangan/adminPages/transaksi/inputAdmin.dart';
-import 'package:aplikasi_keuangan/PERCOBAAN/pdf.dart';
 import 'package:aplikasi_keuangan/adminPages/transaksi/transaksiAdmin.dart';
 import 'package:aplikasi_keuangan/akunPages/tabBarAkun.dart';
 import 'package:aplikasi_keuangan/mainPage/loginPage.dart';
@@ -24,7 +25,9 @@ class adminPage extends StatefulWidget {
   _adminPageState createState() => _adminPageState();
 }
 
+
 class _adminPageState extends State<adminPage>{
+  String? nama = "", nohp = "", email = "", usaha = "", alamat = "";
   late final Widget? endDrawer;
   int _selectedIndex = 0;
   var selectedPage =  [
@@ -36,10 +39,20 @@ class _adminPageState extends State<adminPage>{
   ];
   List<dynamic> user = [];
 
+  
+  getPref() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      usaha = preferences.getString("usaha");
+      alamat = preferences.getString("alamat");
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     fetchData();
+    getPref();
     var level = widget.level;
   }
 
@@ -143,7 +156,7 @@ class _adminPageState extends State<adminPage>{
               onTap: () {
                 Navigator.of(context).push (
                   MaterialPageRoute (
-                    builder:(BuildContext context) => LaporanPosisiKeuangan()
+                    builder:(BuildContext context) => posisiKeuangan()
                   )
                 );
               }
@@ -251,11 +264,14 @@ class _adminPageState extends State<adminPage>{
   }
 }
 
-Widget _drawerHeader(BuildContext context, List<dynamic> user) {
+// Widget _drawerHeader(BuildContext context, List<dynamic> user) {
+  Widget _drawerHeader(BuildContext context, List<dynamic> user) {
   
   return UserAccountsDrawerHeader(
     accountName: Text('${user.isNotEmpty ? user[0]['usaha'] : ''}'),
     accountEmail: Text('${user.isNotEmpty ? user[0]['alamat'] : ''}'),
+    // accountName: Text('$usaha'),
+    // accountEmail: Text('$alamat'),
   );
 }
 

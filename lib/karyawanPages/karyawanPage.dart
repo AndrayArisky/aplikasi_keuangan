@@ -1,4 +1,4 @@
-import 'package:aplikasi_keuangan/PERCOBAAN/tombolCari.dart';
+import 'package:aplikasi_keuangan/PERCOBAAN/login.dart';
 import 'package:aplikasi_keuangan/akunPages/tabBarAkun.dart';
 import 'package:aplikasi_keuangan/karyawanPages/inputKaryawan.dart';
 import 'package:aplikasi_keuangan/karyawanPages/profilKaryawan.dart';
@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class karyawanPage extends StatefulWidget {
   final dynamic level;
-  karyawanPage({super.key, required this.level}); 
+  const karyawanPage({super.key, required this.level}); 
 
   @override
   karyawanPageState createState() => karyawanPageState();

@@ -1,3 +1,4 @@
+import 'package:aplikasi_keuangan/PERCOBAAN/login.dart';
 import 'package:aplikasi_keuangan/mainPage/loginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -5,9 +6,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class profilKaryawan extends StatefulWidget {
+  
   @override
   _profilKaryawanState createState() => _profilKaryawanState();
 }
+
+String? nama = "", nohp = "", email = "", usaha = "", alamat = "";
 
 class _profilKaryawanState extends State<profilKaryawan>{
   //List<dynamic> Data = [];
@@ -15,27 +19,39 @@ class _profilKaryawanState extends State<profilKaryawan>{
   String level = 'karyawan';
   String id_user = '';
 
+  getPref() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      nama = preferences.getString("nama");
+      nohp = preferences.getString("nohp");
+      email = preferences.getString("email");
+      usaha = preferences.getString("usaha");
+      alamat = preferences.getString("alamat");
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    fetchData();
+    //fetchData();
+    getPref();
   }
 
-  Future<void> fetchData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String loginData = prefs.getString('loginData') ?? '';
-    dynamic userData = json.decode(loginData);
-    id_user = userData['id_user'];
-    final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getTransaksi.php?id_user=$id_user'));
-    if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      setState(() {
-        karyawan = jsonData.isNotEmpty ? jsonData[0] : null;
-      });
-    } else {
-      throw Exception('Gagal mengambil data!');
-    }
-  }
+  // Future<void> fetchData() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String loginData = prefs.getString('loginData') ?? '';
+  //   dynamic userData = json.decode(loginData);
+  //   id_user = userData['id_user'];
+  //   final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getTransaksi.php?id_user=$id_user'));
+  //   if (response.statusCode == 200) {
+  //     final jsonData = json.decode(response.body);
+  //     setState(() {
+  //       karyawan = jsonData.isNotEmpty ? jsonData[0] : null;
+  //     });
+  //   } else {
+  //     throw Exception('Gagal mengambil data!');
+  //   }
+  // }
 
   Future<void> clearLoginData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -137,18 +153,18 @@ class karyawanInfo extends StatelessWidget {
                               vertical: 4
                             ),
                             leading: Icon(Icons.person),
-                            title: Text("Nama Admin"),
-                            subtitle: Text(karyawan != null ? karyawan['nama'] : ''),
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.mail_outlined),
-                            title: Text("Email"),
-                            subtitle: Text(karyawan != null ? karyawan['email'] : ''),
+                            title: Text("Nama Anggota"),
+                            subtitle: Text('$nama'),
                           ),
                           ListTile(
                             leading: Icon(Icons.phone),
                             title: Text("No. HP/Telp"),
-                            subtitle: Text(karyawan != null ? karyawan['nohp'] : ''),
+                            subtitle: Text('$nohp'),
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.mail_outlined),
+                            title: Text("Email"),
+                            subtitle: Text('$email'),
                           )
                         ]
                       )

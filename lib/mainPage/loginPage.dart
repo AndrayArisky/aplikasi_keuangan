@@ -22,15 +22,15 @@ class _loginPageState extends State<loginPage> {
   }
 
   
-  void clear() {
-    setState(() {
-      password.clear();
-    });
-  }
+  // void clear() {
+  //   setState(() {
+  //     password.clear();
+  //   });
+  // }
 
   Future<void> login() async {
     final result = await http.post(
-      Uri.parse('https://apkeu2023.000webhostapp.com/login.php'),
+      Uri.parse('https://apkeu2023.000webhostapp.com/loginApk.php'),
       body: {
         "nama": username.text,
         "password": password.text,
@@ -78,7 +78,7 @@ class _loginPageState extends State<loginPage> {
       setState(() {
       // username = datauser[0]['username'];
       });
-  }
+    }
   } 
 
   Widget _buildPageContent () {
@@ -171,48 +171,13 @@ class _loginPageState extends State<loginPage> {
                       ),
                       onPressed: () {
                         login();
-                        clear();
+                        //clear();
                       }, 
                     ),
                   )
                 )
               ],
             ),
-            // SizedBox(
-            //   height: 30,
-            // ),
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.center,
-            //   children: <Widget>[
-            //     Text(
-            //       'Belum punya akun?',
-            //       style: TextStyle(
-            //         color: Colors.black,
-            //         fontSize: 12,
-            //         fontWeight: FontWeight.normal
-            //       ),
-            //     ),
-            //     TextButton(
-            //       onPressed: () {
-            //         // Navigator.pushReplacement(
-            //         //   context, MaterialPageRoute(
-            //         //     builder: (context) {
-            //         //       return registerPage();
-            //         //     }
-            //         //   )
-            //         // );                  
-            //       }, 
-            //       child: Text(
-            //         'Daftar',
-            //         style: TextStyle(
-            //         color: Colors.blue,
-            //         fontSize: 12,
-            //         fontWeight: FontWeight.normal
-            //       ),
-            //       )
-            //     )
-            //   ],
-            // )
           ],
         ),
       ),
