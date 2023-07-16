@@ -5,16 +5,16 @@
 // import 'package:http/http.dart' as http;
 // import 'package:shared_preferences/shared_preferences.dart';
 
-// class loginPage extends StatefulWidget {
-//   const loginPage({super.key});
+// class LoginPage extends StatefulWidget {
+//   const LoginPage({super.key});
 
 //   @override
-//   State<loginPage> createState() => _loginPageState();
+//   State<LoginPage> createState() => _LoginPageState();
 // }
 
 // enum statusLogin { notSignIn, loginAdmin, loginKaryawan }
 
-// class _loginPageState extends State<loginPage> {
+// class _LoginPageState extends State<LoginPage> {
 //   statusLogin _statusLogin = statusLogin.notSignIn;
 //   final formKey = GlobalKey<FormState>();
 //   String? nama, password;
@@ -47,13 +47,14 @@
 //     String nohp = data['nohp'];
 //     String email = data['email'];
 //     String alamat = data['alamat'];
+//     String usaha = data['usaha'];
 //     String level = data['level'];
 //     String id_user = data['id_user'];
 //     if (value == 1) {
 //       setState(() {
 //         _statusLogin = statusLogin.loginAdmin;
 //         _statusLogin = statusLogin.loginKaryawan;
-//         savePref(value, namaAPI, nohp, email, alamat, level, id_user);
+//         savePref(value, namaAPI, nohp, email, alamat, usaha, level, id_user);
 //       });
 //       print(pesan);
 //     } else {
@@ -61,7 +62,7 @@
 //     }
 //   }
 
-//   savePref(int value, String nama, String nohp, String email, String alamat,
+//   savePref(int value, String nama, String nohp, String email, String alamat, String usaha,
 //       String level, String id_user) async {
 //     SharedPreferences preferences = await SharedPreferences.getInstance();
 //     setState(() {
@@ -70,6 +71,7 @@
 //       preferences.setString('nohp', nohp);
 //       preferences.setString('email', email);
 //       preferences.setString('alamat', alamat);
+//       preferences.setString("usaha", usaha);
 //       preferences.setString("level", level);
 //       preferences.setString("id", id_user);
 
@@ -142,7 +144,7 @@
 //                         style: const TextStyle(color: Colors.blue),
 //                         validator: (e) {
 //                           if (e!.isEmpty) {
-//                             return 'Nama tidak boleh kosong';
+//                             return 'Username tidak boleh kosong';
 //                           }
 //                           return null;
 //                         },

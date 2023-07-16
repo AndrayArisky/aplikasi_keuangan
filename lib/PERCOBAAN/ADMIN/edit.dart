@@ -221,9 +221,52 @@ class _EditDataState extends State<EditData> {
       final result = json.decode(response.body);
       if (result['success'] == true) {
         //Navigator.pop(context, true);
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Transaksi berhasil diperbarui!"),
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+              ),
+              actions: <Widget>[
+                ElevatedButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    // Navigator.pushReplacement(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => adminPage(level: 'admin',),
+                    //   ),
+                    // );
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => adminPage(level: 'admin',), // Ganti dengan halaman transaksi yang sesuai
+                      ),
+                      (route) => false
+                    );
+                  },
+                )
+              ],
+            );
+          },
+        );
         print('Berhasil Edit Transaksi!');
         print(idAkun);
       } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal memperbarui transaksi!'),
+            action: SnackBarAction(
+              label: 'Oke',
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
+        );
         print('Gagal Edit Transaksi!');
       }
     } else {
@@ -415,15 +458,16 @@ class _EditDataState extends State<EditData> {
                         style: TextStyle(fontSize: 15),
                       ),
                       onPressed: () {
-                        updateData().then((_) {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => adminPage(level: 'admin',), // Ganti dengan halaman transaksi yang sesuai
-                            ),
-                            (route) => false
-                          );
-                        });
+                        updateData();
+                        //updateData().then((_) {
+                          // Navigator.pushAndRemoveUntil(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => adminPage(level: 'admin',), // Ganti dengan halaman transaksi yang sesuai
+                          //   ),
+                          //   (route) => false
+                          // );
+                        //});
                       },
                     ),
                   ) 

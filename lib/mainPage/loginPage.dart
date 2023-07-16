@@ -61,6 +61,15 @@ class _loginPageState extends State<loginPage> {
       });
     } else {
       if (datauser[0]['level'] == 'admin') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Anda login sebagai Admin!'),
+            action: SnackBarAction(
+              label: 'Oke',
+              onPressed: () {},
+            ),
+          ),  
+        );
         Navigator.pushReplacement(
           context, MaterialPageRoute(
             builder: (context) => adminPage(level: 'admin')
@@ -72,6 +81,15 @@ class _loginPageState extends State<loginPage> {
           context, MaterialPageRoute(
             builder: (context) => karyawanPage(level: 'karyawan')
           )
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Anda login sebagai Karyawan!'),
+            action: SnackBarAction(
+              label: 'Oke',
+              onPressed: () {},
+            ),
+          ),  
         );
         print('Login Berhasil, Selamat Datang di Halaman Karyawan');
       }

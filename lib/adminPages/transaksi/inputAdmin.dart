@@ -135,7 +135,7 @@ class inputAdminState extends State<inputAdmin> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("Data berhasil disimpan!"),
+              title: Text("Transaksi berhasil disimpan!"),
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -163,9 +163,9 @@ class inputAdminState extends State<inputAdmin> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("Gagal menyimpan data!"),
+              title: Text("Gagal menyimpan data transaksi!"),
               content:
-                  Text("Pastikan data yang anda input sudah benar!"),
+                  Text("Pastikan data transaksi yang anda input sudah benar!"),
               actions: <Widget>[
                 ElevatedButton(
                   child: Text("OK"),

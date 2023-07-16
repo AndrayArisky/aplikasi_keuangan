@@ -60,8 +60,8 @@ class _profilKaryawanState extends State<profilKaryawan>{
 
   @override
   Widget build(BuildContext context) {
-    final String title = karyawan != null ? karyawan['usaha'] : '';
-    final String subtitle = karyawan != null ? karyawan['alamat'] : '';
+    // final String title = karyawan != null ? karyawan['usaha'] : '';
+    // final String subtitle = karyawan != null ? karyawan['alamat'] : '';
     
     return Scaffold(
     extendBodyBehindAppBar: true,
@@ -76,7 +76,7 @@ class _profilKaryawanState extends State<profilKaryawan>{
                 crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      title,
+                      '$nama',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -84,7 +84,7 @@ class _profilKaryawanState extends State<profilKaryawan>{
                     ),
                     SizedBox(height: 5),
                     Text(
-                      subtitle,
+                      '$alamat',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.black,
@@ -201,5 +201,15 @@ class karyawanInfo extends StatelessWidget {
       ),
     );
   }
-
 }
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //     content: Text('Data berhasil ditambahkan'),
+        //     action: SnackBarAction(
+        //       label: 'Oke',
+        //       onPressed: () {
+        //         Navigator.pushReplacementNamed(context, '/dataAnggota');
+        //       },
+        //     ),
+        //   ),  
+        // );
