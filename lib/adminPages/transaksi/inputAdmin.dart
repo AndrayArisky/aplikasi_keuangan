@@ -44,7 +44,7 @@ class inputAdminState extends State<inputAdmin> {
   String _formatNominal = '';
   String id_user = '1';
   String? selectedOption;
-  String? selectedIdAkun;
+   String? selectedIdAkun;
 
   List<Tipe> pemasukanData = [];
   List<Tipe> pengeluaranData = [];
@@ -55,7 +55,7 @@ class inputAdminState extends State<inputAdmin> {
   final keterangan = TextEditingController();
 
   Future<List<Tipe>> fetchTipeData() async {
-    var url = Uri.parse('http://apkeu2023.000webhostapp.com/getdata.php');
+    var url = Uri.parse('http://apkeu2023.000webhostapp.com/getAkun.php');
     var response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -70,7 +70,7 @@ class inputAdminState extends State<inputAdmin> {
   }
 
     Future<List<Akun>> fetchAkunData() async {
-    var url = Uri.parse('http://apkeu2023.000webhostapp.com/getdata.php');
+    var url = Uri.parse('http://apkeu2023.000webhostapp.com/getAkun.php');
     var response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -108,7 +108,7 @@ class inputAdminState extends State<inputAdmin> {
 
   // FUNGSI TOMBOL SIMPAN
   void tambahTransaksi() async {
-    var url = Uri.parse('http://apkeu2023.000webhostapp.com/inputdata.php');
+    var url = Uri.parse('http://apkeu2023.000webhostapp.com/inputTransaksi.php');
     var selectedAccount = akunData.firstWhere(
       (account) => account.nama == selectedOption,
       orElse: () => Akun(id_akun: 0, nama: '', tipe: ''),

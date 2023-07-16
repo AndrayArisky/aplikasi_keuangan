@@ -116,7 +116,7 @@ class _EditDataState extends State<EditData> {
   //   }
   // }
   Future<List<Transaksi>> fetchTransaksiData() async {
-    final response = await http.get(Uri.parse('http://apkeu2023.000webhostapp.com/getdata.php'));
+    final response = await http.get(Uri.parse('http://apkeu2023.000webhostapp.com/getAkun.php'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body) as List<dynamic>;
@@ -130,7 +130,7 @@ class _EditDataState extends State<EditData> {
   }
 
   Future<List<Akun>> fetchAkunData() async {
-    final response = await http.get(Uri.parse('http://apkeu2023.000webhostapp.com/getdata.php'));
+    final response = await http.get(Uri.parse('http://apkeu2023.000webhostapp.com/getAkun.php'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body) as List<dynamic>;
@@ -172,7 +172,8 @@ class _EditDataState extends State<EditData> {
     //   });
     // }
     setState(() {
-      selected = selectedAccount.id_akun;
+      //selected = selectedAccount.id_akun;
+      selected = akunData.indexOf(selectedAccount) + 1;
   });
   }
   
@@ -221,6 +222,7 @@ class _EditDataState extends State<EditData> {
       if (result['success'] == true) {
         //Navigator.pop(context, true);
         print('Berhasil Edit Transaksi!');
+        print(idAkun);
       } else {
         print('Gagal Edit Transaksi!');
       }
@@ -245,7 +247,7 @@ class _EditDataState extends State<EditData> {
                 title: Text(transaction.title),
                 onTap: () {
                   setState(() {
-                    selected = index;
+                    selected = index + 1;
                     kategori.text = transaction.title;
                   });
                   Navigator.pop(context);
@@ -414,11 +416,12 @@ class _EditDataState extends State<EditData> {
                       ),
                       onPressed: () {
                         updateData().then((_) {
-                          Navigator.pushReplacement(
+                          Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => transaksiAdmin(), // Ganti dengan halaman transaksi yang sesuai
+                              builder: (context) => adminPage(level: 'admin',), // Ganti dengan halaman transaksi yang sesuai
                             ),
+                            (route) => false
                           );
                         });
                       },

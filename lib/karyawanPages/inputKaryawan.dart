@@ -56,7 +56,7 @@ class inputKaryawanState extends State<inputKaryawan> {
   final keterangan = TextEditingController();
 
   Future<List<Tipe>> fetchTipeData() async {
-    var url = Uri.parse('http://apkeu2023.000webhostapp.com/getdata.php');
+    var url = Uri.parse('http://apkeu2023.000webhostapp.com/Akun/getAkun.php');
     var response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -71,7 +71,7 @@ class inputKaryawanState extends State<inputKaryawan> {
   }
 
     Future<List<Akun>> fetchAkunData() async {
-    var url = Uri.parse('http://apkeu2023.000webhostapp.com/getdata.php');
+    var url = Uri.parse('http://apkeu2023.000webhostapp.com/Akun/getAkun.php');
     var response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -109,7 +109,7 @@ class inputKaryawanState extends State<inputKaryawan> {
 
   // FUNGSI TOMBOL SIMPAN
   void tambahTransaksi() async {
-    var url = Uri.parse('http://apkeu2023.000webhostapp.com/inputdata.php');
+    var url = Uri.parse('http://apkeu2023.000webhostapp.com/inputTransaksi.php');
     var selectedAccount = akunData.firstWhere(
       (account) => account.nama == selectedOption,
       orElse: () => Akun(id_akun: 0, nama: '', tipe: ''),

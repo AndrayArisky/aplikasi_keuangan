@@ -17,7 +17,7 @@ class asetState extends State<aset> {
   }
 
   Future<void> fetchData() async {
-    final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getdata.php'));
+    final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getAkun.php'));
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       final akun = jsonData.where((data) => data['neraca'] == 'Aset').toList();

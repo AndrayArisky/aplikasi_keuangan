@@ -1,14 +1,11 @@
 import 'dart:convert';
-
 import 'package:aplikasi_keuangan/adminPages/adminPage.dart';
-import 'package:aplikasi_keuangan/adminPages/anggota/dataAnggota.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 class tambahAnggota extends StatefulWidget {
   final level;
-  const tambahAnggota({super.key, required this.level});
+  const tambahAnggota({Key? key, required this.level}) : super(key: key);
 
   @override
   _tambahAnggotaState createState() => _tambahAnggotaState();
@@ -17,32 +14,21 @@ class tambahAnggota extends StatefulWidget {
 class _tambahAnggotaState extends State<tambahAnggota> {
 
   bool _isHidePassword = true;
-  //late dynamic level;
   String usaha = "Tidak Ada Nama Usaha";
   String level = "karyawan";
+
+  TextEditingController nama = TextEditingController();
+  TextEditingController email = TextEditingController();
+  TextEditingController nohp = TextEditingController();
+  TextEditingController alamat = TextEditingController();
+  TextEditingController password = TextEditingController();
 
   void _togglePassword() {
     setState(() {
       _isHidePassword = !_isHidePassword;
     });
   }
-
-    void resetData() {
-    setState(() {
-      nama.clear();
-      email.clear();
-      nohp.clear();
-      alamat.clear();
-      password.clear();
-    });
-  }
   
-  final nama = new TextEditingController();
-  final email = new TextEditingController();
-  final nohp = new TextEditingController();
-  final alamat = new TextEditingController();
-  final password = new TextEditingController();
-
   // FUNGSI TOMBOL SIMPAN
   void tambahAnggota() async {
     var url = Uri.parse('http://apkeu2023.000webhostapp.com/inputAnggota.php');
@@ -64,26 +50,41 @@ class _tambahAnggotaState extends State<tambahAnggota> {
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
       if (result['message'] == 'Data berhasil disimpan') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Data berhasil ditambahkan'
-            ),
-            action: SnackBarAction(
-              label: 'Oke',
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, '/dataAnggota');
-              },
-            ),
-          ),  
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //     content: Text('Data berhasil ditambahkan'),
+        //     action: SnackBarAction(
+        //       label: 'Oke',
+        //       onPressed: () {
+        //         Navigator.pushReplacementNamed(context, '/dataAnggota');
+        //       },
+        //     ),
+        //   ),  
+        // );
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Data berhasil disimpan!"),
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+              ),
+              actions: <Widget>[
+                ElevatedButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/dataAnggota');
+                  },
+                )
+              ],
+            );
+          },
         );
-        
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              'Data gagal ditambahkan'
-            ),
+            content: Text('Data gagal ditambahkan'),
             action: SnackBarAction(
               label: 'Oke',
               onPressed: () {
@@ -123,29 +124,52 @@ class _tambahAnggotaState extends State<tambahAnggota> {
               SizedBox(height: 20),
               ListTile(
                 title: TextField(
-                  style: TextStyle(
-                    color: Colors.blue
-                  ),
+                  style: TextStyle(color: Colors.blue),
                   controller: nama,
                   decoration: InputDecoration(
                     labelText: 'Nama Anggota',
-                    hintStyle: TextStyle(
-                      color: Colors.blue
-                    ),
+                    hintStyle: TextStyle(color: Colors.blue),
                     border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0))
-                  )
+                      borderRadius: BorderRadius.all(Radius.circular(5.0))
+                    )
                   ),
                 ),
               ),
               ListTile(
                 title: TextField(
-                  style: TextStyle(
-                    color: Colors.blue
-                  ),
+                  style: TextStyle(color: Colors.blue),
                   controller: email,
                   decoration: InputDecoration(
                     labelText: 'Email Anggota',
+                    hintStyle: TextStyle(color: Colors.blue),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5.0))
+                    )
+                  ),
+                ),
+              ),
+              ListTile(
+                title: TextField(
+                  style: TextStyle(color: Colors.blue),
+                  controller: nohp,
+                  decoration: InputDecoration(
+                    labelText: 'No. HP Anggota',
+                    hintStyle: TextStyle(
+                      color: Colors.blue
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5.0))
+                    )
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              ListTile(
+                title: TextField(
+                  style: TextStyle(color: Colors.blue),
+                  controller: alamat,
+                  decoration: InputDecoration(
+                    labelText: 'Alamat Anggota',
                     hintStyle: TextStyle(
                       color: Colors.blue
                     ),
@@ -157,62 +181,26 @@ class _tambahAnggotaState extends State<tambahAnggota> {
               ),
               ListTile(
                 title: TextField(
-                  style: TextStyle(
-                    color: Colors.blue
-                  ),
-                  controller: nohp,
-                  decoration: InputDecoration(
-                    labelText: 'No. HP Anggota',
-                    hintStyle: TextStyle(
-                      color: Colors.blue
-                    ),
-                    border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0))
-                  )
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              ListTile(
-                title: TextField(
-                  style: TextStyle(
-                    color: Colors.blue
-                  ),
-                  controller: alamat,
-                  decoration: InputDecoration(
-                    labelText: 'Alamat Anggota',
-                    hintStyle: TextStyle(
-                      color: Colors.blue
-                    ),
-                    border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0))
-                  )
-                  ),
-                ),
-              ),
-              ListTile(
-                title: TextField(
-                  style: TextStyle(
-                    color: Colors.blue
-                  ),
+                  style: TextStyle(color: Colors.blue),
                   controller: password,
+                  obscureText: _isHidePassword,
                   decoration: InputDecoration(
                     labelText: 'Password',
                     hintStyle: TextStyle(
                       color: Colors.blue
                     ),
                     suffixIcon: GestureDetector(
-                      onTap: () {
-                        _togglePassword();
-                      },
+                      onTap: _togglePassword,
                       child: Icon(
-                        _isHidePassword ? Icons.visibility_off : Icons.visibility,
+                        _isHidePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                         color: _isHidePassword ? Colors.grey : Colors.blue,
                       ),
                     ),
                     border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0))
-                  )
+                      borderRadius: BorderRadius.all(Radius.circular(5.0))
+                    )
                   ),
                 ),
               ),
@@ -229,7 +217,6 @@ class _tambahAnggotaState extends State<tambahAnggota> {
                         ),
                         onPressed: () {
                           tambahAnggota();
-                          resetData();
                         }, 
                       ),
                     )

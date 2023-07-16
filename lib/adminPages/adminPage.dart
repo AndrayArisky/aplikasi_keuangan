@@ -1,5 +1,7 @@
 import 'package:aplikasi_keuangan/PERCOBAAN/ADMIN/riwayat.dart';
 import 'package:aplikasi_keuangan/PERCOBAAN/ADMIN/transaksi.dart';
+import 'package:aplikasi_keuangan/PERCOBAAN/ANGGOTA/data.dart';
+import 'package:aplikasi_keuangan/PERCOBAAN/ANGGOTA/tambah.dart';
 import 'package:aplikasi_keuangan/PERCOBAAN/login.dart';
 import 'package:aplikasi_keuangan/PERCOBAAN/test6.dart';
 import 'package:aplikasi_keuangan/adminPages/anggota/dataAnggota.dart';
@@ -15,6 +17,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+
+import '../PERCOBAAN/ADMIN/edit2.dart';
+import '../PERCOBAAN/ADMIN/lp.dart';
 
 
 class adminPage extends StatefulWidget {
@@ -156,7 +161,7 @@ class _adminPageState extends State<adminPage>{
               onTap: () {
                 Navigator.of(context).push (
                   MaterialPageRoute (
-                    builder:(BuildContext context) => posisiKeuangan()
+                    builder:(BuildContext context) => PosisiKeuangan()
                   )
                 );
               }

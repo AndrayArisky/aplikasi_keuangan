@@ -6,6 +6,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
+import 'edit2.dart';
+
 class transaksiAdmin extends StatefulWidget {
   @override
   _transaksiAdminState createState() => _transaksiAdminState();
@@ -334,8 +336,9 @@ class _transaksiAdminState extends State<transaksiAdmin> {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) =>
-                                                EditData(transaksi: transactions[index]),
+                                              builder: (context) => EditData(
+                                                transaksi: transactions[index]
+                                              ),
                                             ),
                                           );
                                         },
