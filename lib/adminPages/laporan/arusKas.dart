@@ -8,12 +8,12 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
-class labaRugi extends StatefulWidget {
+class arusKas extends StatefulWidget {
   @override
-  _labaRugiState createState() => _labaRugiState();
+  _arusKasState createState() => _arusKasState();
 }
 
-class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin {
+class _arusKasState extends State<arusKas> with SingleTickerProviderStateMixin {
   List<dynamic> dataTransaksi = [];
   List<dynamic> sortedDates = [];
   List<String> distinctMonthAndYear = [];
@@ -93,11 +93,11 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
     if (distinctMonthAndYear.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Laporan Laba Rugi'),
+          title: Text('Laporan Arus Kas'),
         ),
         body: Center(
           child: Text(
-            'Membaca laporan laba rugi',
+            'Membaca laporan Arus Kas',
             textAlign: TextAlign.center,
           ),
         ),
@@ -112,7 +112,7 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
         initialIndex: initialIndex,
         child: Scaffold(
           appBar: AppBar(
-            title: Text('Laporan Laba Rugi'),
+            title: Text('Laporan Arus Kas'),
             actions: [
               IconButton(
                 icon: Icon(Icons.picture_as_pdf_rounded),
@@ -142,8 +142,7 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
                       );
                     }).toList(),
                     indicator: UnderlineTabIndicator(
-                      borderSide: BorderSide(color: Colors.blue, width: 4)
-                    ),
+                      borderSide: BorderSide(color: Colors.blue, width: 4)),
                   ),
                 ),
               ),
@@ -158,17 +157,17 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
                       return monthAndYearTransaction == monthAndYear;
                     }).toList();
 
-                    Map<String, int> totalPendapatan = {};
-                    Map<String, int> totalBeban = {};
+                    Map<String, int> totalPemasukan = {};
+                    Map<String, int> totalPengeluaran = {};
 
                     transactions.forEach((transaction) {
                       String namaTransaksi = transaction['kategori'];
                       int nilaiTransaksi = int.parse(transaction['nominal'].toString());
-                      String grup = transaction['grup'];
-                      if (grup == 'Pendapatan') {
-                        totalPendapatan[namaTransaksi] = (totalPendapatan[namaTransaksi] ?? 0) + nilaiTransaksi;
-                      } else if (grup == 'Beban') {
-                        totalBeban[namaTransaksi] =(totalBeban[namaTransaksi] ?? 0) + nilaiTransaksi;
+                      String status = transaction['status'];
+                      if (status == 'Pemasukan') {
+                        totalPemasukan[namaTransaksi] = (totalPemasukan[namaTransaksi] ?? 0) + nilaiTransaksi;
+                      } else if (status == 'Pengeluaran') {
+                        totalPengeluaran[namaTransaksi] =(totalPengeluaran[namaTransaksi] ?? 0) + nilaiTransaksi;
                       }
                     });
 
@@ -178,23 +177,21 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: <Widget>[
-                            _buildItemRow('Pendapatan'),
+                            _buildItemRow('Pemasukan'),
                             SizedBox(height: 10.0),
-                            ...totalPendapatan.entries.map((entry) => _buildAkunRow(entry.key, entry.value.toString())).toList(),
+                            ...totalPemasukan.entries.map((entry) => _buildAkunRow(entry.key, entry.value.toString())).toList(),
                             Divider(),
-                            _buildTotalRow('Total Pendapatan', '${rupiah.format(totalPendapatan.values.fold(0, (a, b) => a + b))}'),
+                            _buildTotalRow('Total Pemasukan', '${rupiah.format(totalPemasukan.values.fold(0, (a, b) => a + b))}'),
                             Divider(),
                             SizedBox(height: 20.0),
-                            _buildItemRow('Beban'),
+                            _buildItemRow('Pengeluaran'),
                             SizedBox(height: 10.0),
-                            ...totalBeban.entries.map((entry) => _buildAkunRow(entry.key, entry.value.toString())).toList(),
+                            ...totalPengeluaran.entries.map((entry) => _buildAkunRow(entry.key, entry.value.toString())).toList(),
                             Divider(),
-                            _buildTotalRow('Total Beban', '${rupiah.format(totalBeban.values.fold(0, (a, b) => a + b))}'),
+                            _buildTotalRow('Total Pengeluaran', '${rupiah.format(totalPengeluaran.values.fold(0, (a, b) => a + b))}'),
                             Divider(),
                             SizedBox(height: 40.0),
-                            _buildTotalRow('Total Laba(Rugi) Sebelum Pajak', '${rupiah.format(totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b))}'),
-                            _buildTotalRow('Biaya Pajak Penghasilan', '${rupiah.format(0.025 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b)))}'),
-                            _buildTotalRow('Total Laba(Rugi) Setelah Pajak', '${rupiah.format((totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b)) - (0.025 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b))))}'),
+                            _buildTotalRow('Total Arus Kas', '${rupiah.format(totalPemasukan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b))}'),
                           ],
                         ),
                       ),
@@ -226,9 +223,7 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
         Text(namaAkun),
         Text(
           nilai,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold,),
         ),
       ],
     );
@@ -256,8 +251,9 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
     );
   }
 
-  Future<void> cetakPdf() async {
+  Future <void> cetakPdf() async {
     final pdf = pw.Document();
+
     for (var monthAndYear in distinctMonthAndYear) {
       List<dynamic> transactions = dataTransaksi.where((transaction) {
         DateTime dateTime = DateTime.parse(transaction['tgl_transaksi']);
@@ -267,17 +263,17 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
         return monthAndYearTransaction == monthAndYear;
       }).toList();
 
-      Map<String, int> totalPendapatan = {};
-      Map<String, int> totalBeban = {};
+      Map<String, int> totalPemasukan = {};
+      Map<String, int> totalPengeluaran = {};
 
       transactions.forEach((transaction) {
         String namaTransaksi = transaction['kategori'];
         int nilaiTransaksi = int.parse(transaction['nominal'].toString());
-        String grup = transaction['grup'];
-        if (grup == 'Pendapatan') {
-          totalPendapatan[namaTransaksi] = (totalPendapatan[namaTransaksi] ?? 0) + nilaiTransaksi;
-        } else if (grup == 'Beban') {
-          totalBeban[namaTransaksi] = (totalBeban[namaTransaksi] ?? 0) + nilaiTransaksi;
+        String status = transaction['status'];
+        if (status == 'Pemasukan') {
+          totalPemasukan[namaTransaksi] = (totalPemasukan[namaTransaksi] ?? 0) + nilaiTransaksi;
+        } else if (status == 'Pengeluaran') {
+          totalPengeluaran[namaTransaksi] = (totalPengeluaran[namaTransaksi] ?? 0) + nilaiTransaksi;
         }
       });
 
@@ -287,7 +283,7 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
             return pw.Header(
               level: 0,
               child: pw.Text(
-                'Laporan Laba Rugi\n$monthAndYear',
+                'Laporan Arus Kas\n$monthAndYear',
                 style: pw.TextStyle(
                   fontSize: 20, 
                   fontWeight: pw.FontWeight.bold
@@ -296,26 +292,28 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
             );
           },
           build: (pw.Context context) {
-            final tablePendapatan = pw.Table(
+            final tablePemasukan = pw.Table(
               children: [
                 pw.TableRow(
                   children: [
                     pw.Container(
                       padding: pw.EdgeInsets.only(right: 8),
-                      child: pw.Text('Nama Akun',
+                      child: pw.Text(
+                        'Nama Akun',
                         style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
                       ),
                     ),
                     pw.Container(
                       padding: pw.EdgeInsets.only(left: 8),
                       alignment: pw.Alignment.centerRight,
-                      child: pw.Text('Nilai',
+                      child: pw.Text(
+                        'Nilai',
                         style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
                       ),
                     )
                   ],
                 ),
-                ...totalPendapatan.entries.map((entry) => pw.TableRow(children: [
+                ...totalPemasukan.entries.map((entry) => pw.TableRow(children: [
                   pw.Container(
                     padding: pw.EdgeInsets.only(right: 8),
                     child: pw.Text(entry.key),
@@ -329,14 +327,16 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
                 pw.TableRow(children: [
                   pw.Container(
                     padding: pw.EdgeInsets.only(right: 8),
-                    child: pw.Text('Total Pendapatan',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
+                    child: pw.Text(
+                      'Total Pemasukan',
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
                     ),
                   ),
                   pw.Container(
                     padding: pw.EdgeInsets.only(left: 8),
                     alignment: pw.Alignment.centerRight,
-                    child: pw.Text(rupiah.format(totalPendapatan.values.fold(0, (a, b) => a + b)),
+                    child: pw.Text(
+                      rupiah.format(totalPemasukan.values.fold(0, (a, b) => a + b)),
                       style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
                     ),
                   )
@@ -344,26 +344,28 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
               ],
             );
 
-            final tableBeban = pw.Table(
+            final tablePengeluaran = pw.Table(
               children: [
                 pw.TableRow(
                   children: [
                     pw.Container(
                       padding: pw.EdgeInsets.only(right: 8),
-                      child: pw.Text('Nama Akun',
+                      child: pw.Text(
+                        'Nama Akun',
                         style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
                       ),
                     ),
                     pw.Container(
                       padding: pw.EdgeInsets.only(left: 8),
                       alignment: pw.Alignment.centerRight,
-                      child: pw.Text('Nilai',
+                      child: pw.Text(
+                        'Nilai',
                         style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
                       ),
                     )
                   ],
                 ),
-                ...totalBeban.entries.map((entry) => pw.TableRow(
+                ...totalPengeluaran.entries.map((entry) => pw.TableRow(
                   children: [
                     pw.Container(
                       padding: pw.EdgeInsets.only(right: 8),
@@ -375,19 +377,22 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
                       child: pw.Text(rupiah.format(entry.value)),
                     )
                   ],
-                )),
+                  )
+                ),
                 pw.TableRow(
                   children: [
                     pw.Container(
                       padding: pw.EdgeInsets.only(right: 8),
-                      child: pw.Text('Total Beban',
+                      child: pw.Text(
+                        'Total Pengeluaran',
                         style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
                       ),
                     ),
                     pw.Container(
                       padding: pw.EdgeInsets.only(left: 8),
                       alignment: pw.Alignment.centerRight,
-                      child: pw.Text(rupiah.format(totalBeban.values.fold(0, (a, b) => a + b)),
+                      child: pw.Text(
+                        rupiah.format(totalPengeluaran.values.fold(0, (a, b) => a + b)),
                         style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
                       ),
                     )
@@ -411,7 +416,8 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
                     pw.Container(
                       padding: pw.EdgeInsets.only(left: 8),
                       alignment: pw.Alignment.centerRight,
-                      child: pw.Text('Nilai',
+                      child: pw.Text(
+                        'Nilai',
                         style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
                       ),
                     )
@@ -421,48 +427,16 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
                   children: [
                     pw.Container(
                       padding: pw.EdgeInsets.only(right: 8),
-                      child: pw.Text('Total Laba (Rugi) Sebelum Pajak',
+                      child: pw.Text(
+                        'Arus Kas',
                         style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
                       ),
                     ),
                     pw.Container(
                       padding: pw.EdgeInsets.only(left: 8),
                       alignment: pw.Alignment.centerRight,
-                      child: pw.Text(rupiah.format(totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b)),
-                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
-                      ),
-                    )
-                  ],
-                ),
-                pw.TableRow(
-                  children: [
-                    pw.Container(
-                      padding: pw.EdgeInsets.only(right: 8),
-                      child: pw.Text('Biaya Pajak Penghasilan',
-                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
-                      ),
-                    ),
-                    pw.Container(
-                      padding: pw.EdgeInsets.only(left: 8),
-                      alignment: pw.Alignment.centerRight,
-                      child: pw.Text(rupiah.format(0.025 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b))),
-                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
-                      ),
-                    )
-                  ],
-                ),
-                pw.TableRow(
-                  children: [
-                    pw.Container(
-                      padding: pw.EdgeInsets.only(right: 8),
-                      child: pw.Text('Total Laba (Rugi) Setelah Pajak',
-                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
-                      ),
-                    ),
-                    pw.Container(
-                      padding: pw.EdgeInsets.only(left: 8),
-                      alignment: pw.Alignment.centerRight,
-                      child: pw.Text(rupiah.format((totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b)) - (0.025 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b)))),
+                      child: pw.Text(
+                        rupiah.format(totalPemasukan.values.fold(0, (a, b) => a + b) - totalPengeluaran.values.fold(0, (a, b) => a + b)),
                         style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
                       ),
                     )
@@ -474,19 +448,27 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
             return <pw.Widget>[
               pw.Header(
                 level: 2,
-                child: pw.Text('Pendapatan',
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 15)
+                child: pw.Text(
+                  'Pemasukan',
+                  style: pw.TextStyle(
+                    fontWeight: pw.FontWeight.bold, 
+                    fontSize: 15
+                  )
                 ),
               ),
-              tablePendapatan,
+              tablePemasukan,
               pw.SizedBox(height: 15),
               pw.Header(
                 level: 2,
-                child: pw.Text('Beban',
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 15)
+                child: pw.Text(
+                  'Pengeluaran',
+                  style: pw.TextStyle(
+                    fontWeight: pw.FontWeight.bold, 
+                    fontSize: 15
+                  )
                 ),
               ),
-              tableBeban,
+              tablePengeluaran,
               pw.SizedBox(height: 15),
               tableTotalLabaRugi,
             ];
@@ -496,13 +478,13 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
     }
 
     final outputDir = await getTemporaryDirectory();
-    final filePath = '${outputDir.path}/laporan_laba_rugi.pdf';
+    final filePath = '${outputDir.path}/laporan_arus_kas.pdf';
     final pdfBytes = await pdf.save();
     final pdfFile = File(filePath);
     await pdfFile.writeAsBytes(pdfBytes);
     await Printing.sharePdf(
       bytes: await pdfFile.readAsBytes(),
-      filename: 'laporan_laba_rugi.pdf',
+      filename: 'laporan_arus_kas.pdf',
     );
   }
 }

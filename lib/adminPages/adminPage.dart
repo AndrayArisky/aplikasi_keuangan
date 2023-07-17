@@ -1,25 +1,18 @@
+import 'package:aplikasi_keuangan/LOGOUT/login.dart';
+import 'package:aplikasi_keuangan/LOGOUT/propiladmin.dart';
 import 'package:aplikasi_keuangan/PERCOBAAN/ADMIN/riwayat.dart';
-import 'package:aplikasi_keuangan/PERCOBAAN/ADMIN/transaksi.dart';
-import 'package:aplikasi_keuangan/PERCOBAAN/ANGGOTA/data.dart';
-import 'package:aplikasi_keuangan/PERCOBAAN/ANGGOTA/tambah.dart';
-import 'package:aplikasi_keuangan/PERCOBAAN/login.dart';
-import 'package:aplikasi_keuangan/PERCOBAAN/test6.dart';
 import 'package:aplikasi_keuangan/adminPages/anggota/dataAnggota.dart';
 import 'package:aplikasi_keuangan/adminPages/anggota/tambahAnggota.dart';
+import 'package:aplikasi_keuangan/adminPages/laporan/arusKas.dart';
 import 'package:aplikasi_keuangan/adminPages/laporan/labaRugi.dart';
 import 'package:aplikasi_keuangan/adminPages/laporan/posisiKeuangan.dart';
-import 'package:aplikasi_keuangan/adminPages/profilAdmin.dart';
 import 'package:aplikasi_keuangan/adminPages/transaksi/inputAdmin.dart';
-import 'package:aplikasi_keuangan/adminPages/transaksi/transaksiAdmin.dart';
 import 'package:aplikasi_keuangan/akunPages/tabBarAkun.dart';
 import 'package:aplikasi_keuangan/mainPage/loginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
-import '../PERCOBAAN/ADMIN/edit2.dart';
-import '../PERCOBAAN/ADMIN/lp.dart';
 
 
 class adminPage extends StatefulWidget {
@@ -146,6 +139,17 @@ class _adminPageState extends State<adminPage>{
             ),
             _drawerItem(
               icon: Icons.bar_chart_outlined,
+              text: 'Arus Kas',
+              onTap: () {
+                Navigator.of(context).push (
+                  MaterialPageRoute (
+                    builder:(BuildContext context) => arusKas()
+                  )
+                );
+              }
+            ),
+            _drawerItem(
+              icon: Icons.bar_chart_outlined,
               text: 'Laba Rugi',
               onTap: () {
                 Navigator.of(context).push (
@@ -161,7 +165,7 @@ class _adminPageState extends State<adminPage>{
               onTap: () {
                 Navigator.of(context).push (
                   MaterialPageRoute (
-                    builder:(BuildContext context) => PosisiKeuangan()
+                    builder:(BuildContext context) => posisiKeuangan()
                   )
                 );
               }

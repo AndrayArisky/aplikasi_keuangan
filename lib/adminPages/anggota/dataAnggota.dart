@@ -1,4 +1,3 @@
-import 'package:aplikasi_keuangan/PERCOBAAN/ADMIN/riwayat.dart';
 import 'package:aplikasi_keuangan/adminPages/adminPage.dart';
 import 'package:aplikasi_keuangan/adminPages/anggota/editAnggota.dart';
 import 'package:aplikasi_keuangan/adminPages/anggota/tambahAnggota.dart';
@@ -6,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/widgets.dart';
-
-import '../../PERCOBAAN/ANGGOTA/edit.dart';
 
 class dataAnggota extends StatefulWidget {
   @override
@@ -55,7 +52,7 @@ class dataAnggotaState extends State<dataAnggota> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Hapus Anggota'),
+          title: Text('Hapus Anggota!'),
           content: Text('Yakin ingin menghapus data anggota?'),
           actions: <Widget>[
             TextButton(
@@ -101,7 +98,7 @@ class dataAnggotaState extends State<dataAnggota> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Data Karyawan'),
+          title: Text('Data Anggota'),
           actions: [
             IconButton(
               icon: Icon(
@@ -136,14 +133,12 @@ class dataAnggotaState extends State<dataAnggota> {
                       builder: (BuildContext context) {
                         return Container(
                           child: SingleChildScrollView(
-                            //alignment: Alignment.topLeft,
                             padding: EdgeInsets.all(20),
                             child: Column(
                               children: <Widget>[
                                 Column(
                                   children: <Widget>[
-                                      Text(
-                                        'DATA KARYAWAN',
+                                      Text('DATA KARYAWAN',
                                         style: TextStyle(
                                           color: Colors.blue,
                                           fontSize: 16,
@@ -219,9 +214,10 @@ class dataAnggotaState extends State<dataAnggota> {
                             Text(
                               '${anggota[index]['nama']}',
                               style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black
+                              ),
                             ),
                             Text('${anggota[index]['alamat']}'),
                           ],

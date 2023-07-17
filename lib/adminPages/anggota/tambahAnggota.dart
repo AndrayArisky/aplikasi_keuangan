@@ -12,7 +12,6 @@ class tambahAnggota extends StatefulWidget {
 }
 
 class _tambahAnggotaState extends State<tambahAnggota> {
-
   bool _isHidePassword = true;
   String usaha = "Tidak Ada Nama Usaha";
   String level = "karyawan";
@@ -46,7 +45,6 @@ class _tambahAnggotaState extends State<tambahAnggota> {
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
     print('ID USER : ${widget.level}');
-    
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
       if (result['message'] == 'Data berhasil disimpan') {
@@ -109,18 +107,17 @@ class _tambahAnggotaState extends State<tambahAnggota> {
           child: ListView(
             children: <Widget>[
               SizedBox(
-              height: 50,
-              child: Center(
-                child: Text(
-                  'DATA ANGGOTA BARU',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                   ),
+                height: 50,
+                child: Center(
+                  child: Text('DATA ANGGOTA BARU',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
                 ),
               ),
-            ),
               SizedBox(height: 20),
               ListTile(
                 title: TextField(
@@ -154,9 +151,7 @@ class _tambahAnggotaState extends State<tambahAnggota> {
                   controller: nohp,
                   decoration: InputDecoration(
                     labelText: 'No. HP Anggota',
-                    hintStyle: TextStyle(
-                      color: Colors.blue
-                    ),
+                    hintStyle: TextStyle(color: Colors.blue),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(5.0))
                     )
@@ -170,9 +165,7 @@ class _tambahAnggotaState extends State<tambahAnggota> {
                   controller: alamat,
                   decoration: InputDecoration(
                     labelText: 'Alamat Anggota',
-                    hintStyle: TextStyle(
-                      color: Colors.blue
-                    ),
+                    hintStyle: TextStyle(color: Colors.blue),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(5.0))
                     )
@@ -186,15 +179,11 @@ class _tambahAnggotaState extends State<tambahAnggota> {
                   obscureText: _isHidePassword,
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    hintStyle: TextStyle(
-                      color: Colors.blue
-                    ),
+                    hintStyle: TextStyle(color: Colors.blue),
                     suffixIcon: GestureDetector(
                       onTap: _togglePassword,
                       child: Icon(
-                        _isHidePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                        _isHidePassword ? Icons.visibility_off : Icons.visibility,
                         color: _isHidePassword ? Colors.grey : Colors.blue,
                       ),
                     ),
@@ -211,8 +200,7 @@ class _tambahAnggotaState extends State<tambahAnggota> {
                     child: Container(
                       padding: EdgeInsets.fromLTRB(15, 50, 15, 40),
                       child: ElevatedButton(
-                        child: Text(
-                          'Tambah Anggota',
+                        child: Text('Tambah Anggota',
                           style: TextStyle(fontSize: 15),
                         ),
                         onPressed: () {
