@@ -1,11 +1,14 @@
 import 'dart:convert';
+import 'package:aplikasi_keuangan/mainPage/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:aplikasi_keuangan/karyawanPages/inputKaryawan.dart';
 
 class transaksiKaryawan extends StatefulWidget {
+  late final VoidCallback onLogout;
   @override
   _transaksiKaryawanState createState() => _transaksiKaryawanState();
 }
@@ -27,6 +30,15 @@ class _transaksiKaryawanState extends State<transaksiKaryawan> {
         keterangan.toLowerCase().contains(keyword.toLowerCase());
       }).toList();
     });
+  }
+
+    void handleLogout() {
+    widget.onLogout();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => loginPage()),
+      (Route<dynamic> route) => false,
+    );
   }
 
   @override

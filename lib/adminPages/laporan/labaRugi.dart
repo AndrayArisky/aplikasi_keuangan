@@ -190,8 +190,8 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
                             Divider(),
                             SizedBox(height: 40.0),
                             _buildTotalRow('Total Laba(Rugi) Sebelum Pajak', '${rupiah.format(totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b))}'),
-                            _buildTotalRow('Biaya Pajak Penghasilan', '${rupiah.format(0.025 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b)))}'),
-                            _buildTotalRow('Total Laba(Rugi) Setelah Pajak', '${rupiah.format((totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b)) - (0.025 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b))))}'),
+                            _buildTotalRow('Biaya Pajak Penghasilan', '${rupiah.format(0.005 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b)))}'),
+                            _buildTotalRow('Total Laba(Rugi) Setelah Pajak', '${rupiah.format((totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b)) - (0.005 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b))))}'),
                           ],
                         ),
                       ),
@@ -442,7 +442,7 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
                     pw.Container(
                       padding: pw.EdgeInsets.only(left: 8),
                       alignment: pw.Alignment.centerRight,
-                      child: pw.Text(rupiah.format(0.025 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b))),
+                      child: pw.Text(rupiah.format(0.005 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b))),
                         style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
                       ),
                     )
@@ -459,7 +459,7 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
                     pw.Container(
                       padding: pw.EdgeInsets.only(left: 8),
                       alignment: pw.Alignment.centerRight,
-                      child: pw.Text(rupiah.format((totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b)) - (0.025 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b)))),
+                      child: pw.Text(rupiah.format((totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b)) - (0.005 * (totalPendapatan.values.fold(0, (a, b) => a + b) - totalBeban.values.fold(0, (a, b) => a + b)))),
                         style: pw.TextStyle(fontWeight: pw.FontWeight.bold)
                       ),
                     )
