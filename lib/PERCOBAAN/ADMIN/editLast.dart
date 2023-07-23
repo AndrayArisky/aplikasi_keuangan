@@ -1,5 +1,4 @@
 // import 'dart:convert';
-// import 'package:aplikasi_keuangan/PERCOBAAN/ADMIN/riwayat.dart';
 // import 'package:aplikasi_keuangan/adminPages/adminPage.dart';
 // import 'package:aplikasi_keuangan/akunPages/tabBarAkun.dart';
 // import 'package:flutter/material.dart';
@@ -87,34 +86,6 @@
 //     keterangan.text = widget.transaksi['keterangan'];
 //   }
 
-//   // Future<List<Transaksi>> fetchTransaksiData() async {
-//   //   final response = await http.get(Uri.parse('http://apkeu2023.000webhostapp.com/getdata.php'));
-
-//   //   if (response.statusCode == 200) {
-//   //     final data = json.decode(response.body) as List<dynamic>;
-//   //     return data.map((item) => Transaksi(
-//   //       title: item['nm_akun'],
-//   //       type: item['tipe'],
-//   //     )).toList();
-//   //   } else {
-//   //     throw Exception('Failed to fetch tipe data');
-//   //   }
-//   // }
-
-//   // Future<List<Akun>> fetchAkunData() async {
-//   //   final response = await http.get(Uri.parse('http://apkeu2023.000webhostapp.com/getdata.php'));
-
-//   //   if (response.statusCode == 200) {
-//   //     final data = json.decode(response.body) as List<dynamic>;
-//   //     return data.map((item) => Akun(
-//   //       id_akun: int.parse(item['id_akun']),
-//   //       nama: item['nm_akun'],
-//   //       tipe: item['tipe'],
-//   //     )).toList();
-//   //   } else {
-//   //     throw Exception('Failed to fetch tipe data');
-//   //   }
-//   // }
 //   Future<List<Transaksi>> fetchTransaksiData() async {
 //     final response = await http.get(Uri.parse('http://apkeu2023.000webhostapp.com/getAkun.php'));
 
@@ -166,13 +137,7 @@
 //       (account) => account.id_akun == accountId,
 //       orElse: () => Akun(id_akun: 0, nama: '', tipe: ''),
 //     );
-//     // if (selectedAccount.id_akun != 0) {
-//     //   setState(() {
-//     //     selected = selectedAccount.id_akun;
-//     //   });
-//     // }
 //     setState(() {
-//       //selected = selectedAccount.id_akun;
 //       selected = akunData.indexOf(selectedAccount) + 1;
 //   });
 //   }
@@ -200,11 +165,12 @@
 //   }
 
 //   Future<void> updateData() async {
-//     final selectedAccount = akunData.firstWhere(
-//       (account) => account.id_akun == selected,
-//       orElse: () => Akun(id_akun: 0, nama: '', tipe: ''),
-//     );
-//     final idAkun = selectedAccount.id_akun != null ? selectedAccount.id_akun.toString() : '0';
+//     // final selectedAccount = akunData.firstWhere(
+//     //   (account) => account.id_akun == selected,
+//     //   orElse: () => Akun(id_akun: 0, nama: '', tipe: ''),
+//     // );
+//     //final idAkun = selectedAccount.id_akun != null ? selectedAccount.id_akun.toString() : '0';
+//     final idAkun = widget.transaksi['id_akun'].toString();
 //     final response = await http.post(
 //       Uri.parse('http://apkeu2023.000webhostapp.com/updateTransaksi.php'),
 //       body: {
@@ -234,12 +200,6 @@
 //                 ElevatedButton(
 //                   child: Text("OK"),
 //                   onPressed: () {
-//                     // Navigator.pushReplacement(
-//                     //   context,
-//                     //   MaterialPageRoute(
-//                     //     builder: (context) => adminPage(level: 'admin',),
-//                     //   ),
-//                     // );
 //                     Navigator.pushAndRemoveUntil(
 //                       context,
 //                       MaterialPageRoute(
@@ -303,6 +263,58 @@
 //     );
 //   }
 
+//   Future<void> hapusTransaksi() async {
+//   final response = await http.post(
+//     Uri.parse('http://apkeu2023.000webhostapp.com/deleteTransaksi.php'),
+//     body: {'no_transaksi': widget.transaksi['no_transaksi']},
+//   );
+//   if (response.statusCode == 200) {
+//     final result = json.decode(response.body);
+//     showDialog(
+//       context: context,
+//       builder: (BuildContext context) {
+//         return AlertDialog(
+//           title: Text('Hapus Transaksi!'),
+//           content: Text('Yakin ingin menghapus data transaksi?'),
+//           actions: <Widget>[
+//             TextButton(
+//               onPressed: () {
+//                 Navigator.of(context).pop();
+//               },
+//               child: Text('Batal'),
+//             ),
+//             TextButton(
+//               onPressed: () {
+//                 Navigator.pushAndRemoveUntil(
+//                   context,
+//                   MaterialPageRoute(
+//                     builder: (context) => adminPage(level: 'admin',),
+//                   ),
+//                   (route) => false,
+//                 );
+//               },
+//               child: Text('Yakin'),
+//             )
+//           ],
+//         );
+//       },
+//     );
+//   } else {
+//     ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(
+//           content: Text('Gagal menghapus transaksi!'),
+//           action: SnackBarAction(
+//             label: 'Oke',
+//             onPressed: () {
+//               Navigator.of(context).pop();
+//             },
+//           ),
+//         ),
+//       );
+//   }
+// }
+
+
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
@@ -312,7 +324,10 @@
 //           Tooltip(
 //             message: 'Hapus',
 //             child: IconButton(
-//               onPressed: () {},
+//               onPressed: () {
+//                 hapusTransaksi();
+//                 //confirmDeleteTransaction(akunData[]);
+//               },
 //               icon: Icon(Icons.delete),
 //             ),
 //           ),
@@ -459,15 +474,6 @@
 //                       ),
 //                       onPressed: () {
 //                         updateData();
-//                         //updateData().then((_) {
-//                           // Navigator.pushAndRemoveUntil(
-//                           //   context,
-//                           //   MaterialPageRoute(
-//                           //     builder: (context) => adminPage(level: 'admin',), // Ganti dengan halaman transaksi yang sesuai
-//                           //   ),
-//                           //   (route) => false
-//                           // );
-//                         //});
 //                       },
 //                     ),
 //                   ) 

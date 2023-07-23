@@ -96,10 +96,7 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
           title: Text('Laporan Laba Rugi'),
         ),
         body: Center(
-          child: Text(
-            'Membaca laporan laba rugi',
-            textAlign: TextAlign.center,
-          ),
+         child: CircularProgressIndicator(),
         ),
       );
     } else {

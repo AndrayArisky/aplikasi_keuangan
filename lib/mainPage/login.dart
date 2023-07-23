@@ -1,11 +1,9 @@
 import 'dart:convert';
-import 'package:aplikasi_keuangan/LOGOUT/krywnPage.dart';
 import 'package:aplikasi_keuangan/adminPages/adminPage.dart';
 import 'package:aplikasi_keuangan/karyawanPages/karyawanPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 class loginPage extends StatefulWidget {
   const loginPage({super.key});
@@ -39,9 +37,9 @@ class _loginPageState extends State<loginPage> {
 
   login() async {
     final response = await http.post(
-        Uri.parse('https://apkeu2023.000webhostapp.com/login.php'),
-        body: {"nama": nama, "password": password});
-
+      Uri.parse('https://apkeu2023.000webhostapp.com/login.php'),
+      body: {"nama": nama, "password": password}
+    );
     final data = jsonDecode(response.body);
     int value = data['value'];
     String pesan = data['message'];
@@ -54,18 +52,41 @@ class _loginPageState extends State<loginPage> {
     String id_user = data['id_user'];
     if (value == 1) {
       setState(() {
-        _statusLogin = statusLogin.loginAdmin;
-        _statusLogin = statusLogin.loginKaryawan;
+        _statusLogin = level == "admin" ? statusLogin.loginAdmin : statusLogin.loginKaryawan;
         savePref(value, namaAPI, nohp, email, alamat, usaha, level, id_user);
       });
+      String snackbarMessage = level == "admin" ? 'Berhasil masuk sebagai Admin!' : 'Berhasil masuk sebagai Anggota!';
+      WidgetsBinding.instance?.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(snackbarMessage),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      });
+      clearTextFields();
       print(pesan);
     } else {
-      print(pesan);
+      WidgetsBinding.instance?.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal masuk! Periksa username and password.'),
+            duration: Duration(seconds: 2)
+          ),
+        );
+      });
     }
+  } 
+
+  clearTextFields() {
+    setState(() {
+      nama = null;
+      password = null;
+    });
   }
 
-  savePref(int value, String nama, String nohp, String email, String alamat, String usaha,
-      String level, String id_user) async {
+  savePref(int value, String nama, String nohp, String email, String alamat,
+      String usaha, String level, String id_user) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
       preferences.setInt('value', value);
@@ -76,14 +97,6 @@ class _loginPageState extends State<loginPage> {
       preferences.setString("usaha", usaha);
       preferences.setString("level", level);
       preferences.setString("id", id_user);
-
-      if (level == "admin") {
-        _statusLogin = statusLogin.loginAdmin;
-      } else if (level == "karyawan") {
-        _statusLogin = statusLogin.loginKaryawan;
-      } else {
-        _statusLogin = statusLogin.notSignIn;
-      }
     });
   }
 
@@ -101,7 +114,7 @@ class _loginPageState extends State<loginPage> {
       }
     });
   }
-  
+
   signOut() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
@@ -115,13 +128,6 @@ class _loginPageState extends State<loginPage> {
     super.initState();
     getPref();
   }
-
-  //  void handleLogout() {
-  //   logoutAndClearData(); // Panggil fungsi untuk logout dan hapus data
-  //   setState(() {
-  //     _statusLogin = statusLogin.notSignIn; // Set status login ke notSignIn
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -202,11 +208,8 @@ class _loginPageState extends State<loginPage> {
                           child: Container(
                             padding: EdgeInsets.fromLTRB(15, 25, 15, 25),
                             child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue
-                              ),
-                              child: Text(
-                                'Masuk',
+                              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                              child: Text('Masuk',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 15
@@ -225,15 +228,12 @@ class _loginPageState extends State<loginPage> {
               ),
             ),
           ),
-
         );
-        break;
-      case statusLogin.loginAdmin:
+      case statusLogin.loginAdmin: 
         return adminPage(level: 'admin');
-        break;
       case statusLogin.loginKaryawan:
-        return karyawanPage(level: 'karyawan',);
-        break;
+        return karyawanPage(level: 'karyawan', onLogout: signOut);
     }
   }
 }
+

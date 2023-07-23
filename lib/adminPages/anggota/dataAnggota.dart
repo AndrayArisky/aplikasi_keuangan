@@ -138,7 +138,7 @@ class dataAnggotaState extends State<dataAnggota> {
                               children: <Widget>[
                                 Column(
                                   children: <Widget>[
-                                      Text('DATA KARYAWAN',
+                                      Text('DETAIL DATA ANGGOTA',
                                         style: TextStyle(
                                           color: Colors.blue,
                                           fontSize: 16,

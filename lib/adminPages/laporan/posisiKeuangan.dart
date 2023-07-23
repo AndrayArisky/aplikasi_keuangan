@@ -109,10 +109,7 @@ class _posisiKeuanganState extends State<posisiKeuangan>
           title: Text('Laporan Posisi Keuangan'),
         ),
         body: Center(
-          child: Text(
-            'Membaca laporan posisi keuangan',
-            textAlign: TextAlign.center,
-          ),
+          child: CircularProgressIndicator(),
         ),
       );
     } else {
@@ -155,7 +152,7 @@ class _posisiKeuanganState extends State<posisiKeuangan>
                       );
                     }).toList(),
                     indicator: UnderlineTabIndicator(
-                        borderSide: BorderSide(color: Colors.blue, width: 4)),
+                      borderSide: BorderSide(color: Colors.blue, width: 4)),
                   ),
                 ),
               ),
@@ -221,8 +218,7 @@ class _posisiKeuanganState extends State<posisiKeuangan>
                             ...totalAsetTetap.entries.map((entry) => _buildAkunRow(entry.key, entry.value.toString())).toList(),
                             ...totalAkumulasiPenyusutan.entries.map((entry) => _buildAkunRow(entry.key, entry.value.toString())).toList(),
                             Divider(),
-                            _buildTotalRow('Total Aset Lancar',
-                                '${rupiah.format(totalAsetLancar.values.fold(0, (a, b) => a + b))}'),
+                            _buildTotalRow('Total Aset Lancar', '${rupiah.format(totalAsetLancar.values.fold(0, (a, b) => a + b))}'),
                             _buildTotalRow('Total Aset Tetap', '${rupiah.format(totalAsetTetap.values.fold(0, (a, b) => a + b))}'),
                             _buildTotalRow('Total Akumulasi Penyusutan', '${rupiah.format(totalAkumulasiPenyusutan.values.fold(0, (a, b) => a + b))}'),
                             Divider(),

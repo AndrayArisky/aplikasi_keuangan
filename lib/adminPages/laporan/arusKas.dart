@@ -96,10 +96,7 @@ class _arusKasState extends State<arusKas> with SingleTickerProviderStateMixin {
           title: Text('Laporan Arus Kas'),
         ),
         body: Center(
-          child: Text(
-            'Membaca laporan Arus Kas',
-            textAlign: TextAlign.center,
-          ),
+          child: CircularProgressIndicator(),
         ),
       );
     } else {

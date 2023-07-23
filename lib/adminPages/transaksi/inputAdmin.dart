@@ -126,58 +126,52 @@ class inputAdminState extends State<inputAdmin> {
     var response = await http.post(url, body: body);
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
-    //print('ID USER : ${widget.id_user}, selectedDate $selectedDate');
 
     if (response.statusCode == 200) {
-      final result = json.decode(response.body);
-      if (result['message'] == 'Data berhasil disimpan') {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Transaksi berhasil disimpan!"),
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-              ),
-              actions: <Widget>[
-                ElevatedButton(
-                  child: Text("OK"),
-                  onPressed: () {
-                    //Navigator.of(context).pop();
-                    Navigator.pushAndRemoveUntil(
-                      context, 
-                      MaterialPageRoute(
-                        builder: (context) => adminPage(level: 'admin')
-                      ),
-                      (route) => false
-                    );
-                  },
-                )
-              ],
-            );
-          },
-        );
-      } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Gagal menyimpan data transaksi!"),
-              content:
-                  Text("Pastikan data transaksi yang anda input sudah benar!"),
-              actions: <Widget>[
-                ElevatedButton(
-                  child: Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
-              ],
-            );
-          },
-        );
-      }
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Transaksi berhasil disimpan!"),
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+            ),
+            actions: <Widget>[
+              ElevatedButton(
+                child: Text("OK"),
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                    context, 
+                    MaterialPageRoute(
+                      builder: (context) => adminPage(level: 'admin')
+                    ),
+                    (route) => false
+                  );
+                },
+              )
+            ],
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Gagal menyimpan transaksi!"),
+            content: Text("Pastikan transaksi yang anda input sudah benar!"),
+            actions: <Widget>[
+              ElevatedButton(
+                child: Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -289,10 +283,8 @@ class inputAdminState extends State<inputAdmin> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor:
-                          selectedIndex == 2 ? Colors.red : Colors.grey,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero),
+                      backgroundColor: selectedIndex == 2 ? Colors.red : Colors.grey,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                     ),
                     child: Text(
                       "PENGELUARAN",
@@ -312,15 +304,10 @@ class inputAdminState extends State<inputAdmin> {
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
                       backgroundColor: selectedIndex == 1 ? Colors.green : Colors.grey,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.zero
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero)
                     ),
-                    child: Text(
-                      "PEMASUKAN",
-                      style: TextStyle(
-                        fontSize: 15,
-                      ),
+                    child: Text("PEMASUKAN",
+                      style: TextStyle(fontSize: 15),
                     ),
                     onPressed: () {
                       addIncome();
@@ -371,32 +358,27 @@ class inputAdminState extends State<inputAdmin> {
             // TANGGAL
             TextField(
               controller: TextEditingController(
-                text: "${DateFormat ('EEEE, dd MMMM yyyy', 'id_ID'). format(selectedDate)}"
+                text: "${DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(selectedDate)}"
               ),
               decoration: InputDecoration(
-                icon: Icon(
-                  Icons.calendar_month_sharp
-                ), 
+                icon: Icon(Icons.calendar_month_sharp),
                 labelText: "Tanggal",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0))
-                )
-              ),
+                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5.0)))),
               readOnly: true,
               onTap: () {
                 showDatePicker(
-                  context: context, 
-                  initialDate: selectedDate, 
+                  context: context,
+                  initialDate: selectedDate,
                   firstDate: DateTime(2000),
-                  lastDate: DateTime(2101)
-                ).then((value) {
-                  if(value != null) {
-                    setState(() {
-                      selectedDate = value;
-                      print(selectedDate);
-                    });
+                  lastDate: DateTime(2101)).then((value) {
+                    if (value != null) {
+                      setState(() {
+                        selectedDate = value;
+                        print(selectedDate);
+                      });
+                    }
                   }
-                });
+                );
               },
             ),
                        
@@ -408,26 +390,20 @@ class inputAdminState extends State<inputAdmin> {
               decoration: InputDecoration(
                 icon: Icon(Icons.attach_money),
                 labelText: "Nominal",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0))
-                )
+                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5.0)))
               ),
               keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly
-              ], 
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly] 
             ),
             
             SizedBox(height: 10.0),
             // KETERANGAN
             TextField(
-              controller: keterangan, //editing controller of this TextField
+              controller: keterangan,
               decoration: InputDecoration(
-                  icon: Icon(Icons.edit_note_rounded), //icon of text field
-                  labelText: "Keterangan", //label text of field
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0))
-                  )
+                icon: Icon(Icons.edit_note_rounded),
+                labelText: "Keterangan", 
+                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5.0)))
               ),
             ),
 
@@ -440,8 +416,7 @@ class inputAdminState extends State<inputAdmin> {
                   child: Container(
                     padding: EdgeInsets.only(top:20),
                     child: ElevatedButton(
-                      child: Text(
-                        "Tambah",
+                      child: Text("Tambah",
                         style: TextStyle(fontSize: 15),
                       ),
                       onPressed: () {

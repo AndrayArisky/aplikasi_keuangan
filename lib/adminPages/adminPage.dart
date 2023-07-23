@@ -1,11 +1,11 @@
-import 'package:aplikasi_keuangan/LOGOUT/login.dart';
+import 'package:aplikasi_keuangan/mainPage/login.dart';
 import 'package:aplikasi_keuangan/LOGOUT/propiladmin.dart';
-import 'package:aplikasi_keuangan/PERCOBAAN/ADMIN/riwayat.dart';
 import 'package:aplikasi_keuangan/adminPages/anggota/dataAnggota.dart';
 import 'package:aplikasi_keuangan/adminPages/anggota/tambahAnggota.dart';
 import 'package:aplikasi_keuangan/adminPages/laporan/arusKas.dart';
 import 'package:aplikasi_keuangan/adminPages/laporan/labaRugi.dart';
 import 'package:aplikasi_keuangan/adminPages/laporan/posisiKeuangan.dart';
+import 'package:aplikasi_keuangan/adminPages/profilAdmin.dart';
 import 'package:aplikasi_keuangan/adminPages/transaksi/inputAdmin.dart';
 import 'package:aplikasi_keuangan/akunPages/tabBarAkun.dart';
 import 'package:aplikasi_keuangan/mainPage/loginPage.dart';
@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:aplikasi_keuangan/adminPages/transaksi/transaksiAdmin.dart';
 
 
 class adminPage extends StatefulWidget {
@@ -25,17 +26,13 @@ class adminPage extends StatefulWidget {
 
 
 class _adminPageState extends State<adminPage>{
-  String? nama = "", nohp = "", email = "", usaha = "", alamat = "";
+  String? usaha = "", alamat = "";
   late final Widget? endDrawer;
   int _selectedIndex = 0;
   var selectedPage =  [
     transaksiAdmin(),
-    //tabBarAkun(),
-    //ProfilPage()
     profilAdmin(),
-    // profilAdmin(), 
   ];
-  List<dynamic> user = [];
 
   
   getPref() async {
@@ -49,22 +46,7 @@ class _adminPageState extends State<adminPage>{
   @override
   void initState() {
     super.initState();
-    fetchData();
     getPref();
-    var level = widget.level;
-  }
-
-  Future<void> fetchData() async {
-    final response = await http.get(Uri.parse('https://apkeu2023.000webhostapp.com/getUser.php'));
-    if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      final admin = jsonData.where((data) => data['level'] == 'admin').toList();
-      setState(() {
-        user = admin;
-      });
-    } else {
-      throw Exception('Gagal mengambil data!');
-    }
   }
 
   Future<void> clearLoginData() async {
@@ -83,7 +65,30 @@ class _adminPageState extends State<adminPage>{
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            _drawerHeader(context, user),
+            DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue,),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    '$usaha',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    '$alamat',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
             _drawerItem(
               icon: Icons.category_outlined,
               text: 'Daftar Akun',
@@ -120,7 +125,6 @@ class _adminPageState extends State<adminPage>{
               icon: Icons.people_alt_rounded,
               text: 'Data Anggota',
               onTap: () {
-                var data;
                 Navigator.of(context).push (
                   MaterialPageRoute (
                     builder:(BuildContext context) => dataAnggota()
@@ -138,7 +142,7 @@ class _adminPageState extends State<adminPage>{
                 )),
             ),
             _drawerItem(
-              icon: Icons.bar_chart_outlined,
+              icon: Icons.payments,
               text: 'Arus Kas',
               onTap: () {
                 Navigator.of(context).push (
@@ -171,17 +175,11 @@ class _adminPageState extends State<adminPage>{
               }
               ),
             Divider(height: 15, thickness: 1),
-            // _drawerItem(
-            //   icon: Icons.settings,
-            //   text: 'Pengaturan',
-            //   onTap: () {}
-            // ),
             _drawerItem(
               icon: Icons.logout,
               text: 'Keluar',
               onTap: () {
                 clearLoginData();
-                // Navigasi ke halaman login
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => loginPage()),
@@ -212,10 +210,8 @@ class _adminPageState extends State<adminPage>{
       bottomNavigationBar: BottomAppBar(
         color: Colors.blue,
         shape: AutomaticNotchedShape(
-              RoundedRectangleBorder(),
-          StadiumBorder(
-            side: BorderSide(),
-          ),
+          RoundedRectangleBorder(),
+          StadiumBorder(side: BorderSide()),
         ),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 30),
@@ -237,20 +233,6 @@ class _adminPageState extends State<adminPage>{
                 ),
                 iconSize: 30,
               ),
-              // IconButton(
-              //   onPressed: () {
-              //     selectedPage[1];
-              //     setState(() {
-              //       _selectedIndex = 1;
-              //       print('Halaman Nama Akun');
-              //     });
-              //   }, 
-              //   icon: Icon(
-              //     Icons.category_outlined,
-              //     color: _selectedIndex == 1 ? Colors.black : Colors.white,
-              //   ),
-              //   iconSize: 30,
-              // ),
               IconButton(
                 onPressed: () {
                   selectedPage[1];
@@ -273,16 +255,12 @@ class _adminPageState extends State<adminPage>{
   }
 }
 
-// Widget _drawerHeader(BuildContext context, List<dynamic> user) {
-  Widget _drawerHeader(BuildContext context, List<dynamic> user) {
-  
-  return UserAccountsDrawerHeader(
-    accountName: Text('${user.isNotEmpty ? user[0]['usaha'] : ''}'),
-    accountEmail: Text('${user.isNotEmpty ? user[0]['alamat'] : ''}'),
-    // accountName: Text('$usaha'),
-    // accountEmail: Text('$alamat'),
-  );
-}
+// Widget _drawerHeader() {
+//   return UserAccountsDrawerHeader(
+//     accountName: Text('$usaha'),
+//     accountEmail: Text('$alamat'),
+//   );
+// }
 
 Widget _drawerItem({
   required IconData icon, 
@@ -294,11 +272,8 @@ Widget _drawerItem({
         Icon(icon),
         Padding(
           padding: EdgeInsets.only(left: 25.0),
-          child: Text(
-            text,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
+          child: Text(text,
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
       ],

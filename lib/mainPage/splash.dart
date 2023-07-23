@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:aplikasi_keuangan/LOGOUT/login.dart';
+import 'package:aplikasi_keuangan/mainPage/login.dart';
 import 'package:aplikasi_keuangan/mainPage/loginPage.dart';
 import 'package:flutter/material.dart';
 

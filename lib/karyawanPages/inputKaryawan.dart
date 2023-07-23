@@ -7,14 +7,11 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
-class Tipe{
+class Tipe {
   final String title;
   final String type;
 
-  Tipe({
-    required this.title, 
-    required this.type
-  });
+  Tipe({required this.title, required this.type});
 }
 
 class Akun {
@@ -31,14 +28,14 @@ class Akun {
 
 class inputKaryawan extends StatefulWidget {
   final level;
-  inputKaryawan({required this.level});
+  final VoidCallback onLogout;
+  const inputKaryawan({super.key, required this.level, required this.onLogout});
 
   @override
   inputKaryawanState createState() => inputKaryawanState();
 }
 
 class inputKaryawanState extends State<inputKaryawan> {
-
   int? selected = -1;
   int selectedIndex = 2;
   String status = 'Pengeluaran';
@@ -46,18 +43,22 @@ class inputKaryawanState extends State<inputKaryawan> {
   String _formatNominal = '';
   String id_user = '2';
   String? selectedOption;
-   String? selectedIdAkun;
+  String? selectedIdAkun;
 
   List<Tipe> pemasukanData = [];
   List<Tipe> pengeluaranData = [];
-   List<Akun> akunData = [];
+  List<Akun> akunData = [];
 
   final kategori = TextEditingController();
   final nominal = TextEditingController();
   final keterangan = TextEditingController();
 
+  void handleLogout() {
+    widget.onLogout();
+  }
+
   Future<List<Tipe>> fetchTipeData() async {
-    var url = Uri.parse('http://apkeu2023.000webhostapp.com/Akun/getAkun.php');
+    var url = Uri.parse('http://apkeu2023.000webhostapp.com/getAkun.php');
     var response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -71,8 +72,8 @@ class inputKaryawanState extends State<inputKaryawan> {
     }
   }
 
-    Future<List<Akun>> fetchAkunData() async {
-    var url = Uri.parse('http://apkeu2023.000webhostapp.com/Akun/getAkun.php');
+  Future<List<Akun>> fetchAkunData() async {
+    var url = Uri.parse('http://apkeu2023.000webhostapp.com/getAkun.php');
     var response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -128,58 +129,55 @@ class inputKaryawanState extends State<inputKaryawan> {
     var response = await http.post(url, body: body);
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
-    //print('ID USER : ${widget.id_user}, selectedDate $selectedDate');
 
     if (response.statusCode == 200) {
-      final result = json.decode(response.body);
-      if (result['message'] == 'Data berhasil disimpan') {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Data berhasil disimpan!"),
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-              ),
-              actions: <Widget>[
-                ElevatedButton(
-                  child: Text("OK"),
-                  onPressed: () {
-                    //Navigator.of(context).pop();
-                    Navigator.pushAndRemoveUntil(
-                      context, 
-                      MaterialPageRoute(
-                        builder: (context) => karyawanPage(level: 'karyawan')
-                      ),
-                      (route) => false
-                    );
-                  },
-                )
-              ],
-            );
-          },
-        );
-      } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Gagal menyimpan data!"),
-              content:
-                  Text("Pastikan data yang anda input sudah benar!"),
-              actions: <Widget>[
-                ElevatedButton(
-                  child: Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
-              ],
-            );
-          },
-        );
-      }
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Transaksi berhasil disimpan!"),
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+            ),
+            actions: <Widget>[
+              ElevatedButton(
+                child: Text("OK"),
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => karyawanPage(
+                        level: 'karyawan', 
+                        onLogout: handleLogout
+                      )
+                    ),
+                    (route) => false
+                  );
+                },
+              )
+            ],
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Gagal menyimpan transaksi!"),
+            content: Text("Pastikan transaksi yang anda input sudah benar!"),
+            actions: <Widget>[
+              ElevatedButton(
+                child: Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -264,15 +262,18 @@ class inputKaryawanState extends State<inputKaryawan> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Tambah Transaksi'),
+      appBar: AppBar(
+        title: Text('Tambah Transaksi'),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => karyawanPage(level: 'karyawan'),
+                  builder: (context) => karyawanPage(
+                    level: 'karyawan',
+                    onLogout: () {},
+                  ),
                 ),
                 (route) => false,
               );
@@ -281,8 +282,7 @@ class inputKaryawanState extends State<inputKaryawan> {
         ),
         body: Container(
           padding: EdgeInsets.all(20),
-          child: Column(
-            children: <Widget>[
+          child: Column(children: <Widget>[
             // TOMBOL PEMASUKAN DAN PENGELUARAN
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -291,10 +291,8 @@ class inputKaryawanState extends State<inputKaryawan> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor:
-                          selectedIndex == 2 ? Colors.red : Colors.grey,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero),
+                      backgroundColor: selectedIndex == 2 ? Colors.red : Colors.grey,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                     ),
                     child: Text(
                       "PENGELUARAN",
@@ -314,15 +312,10 @@ class inputKaryawanState extends State<inputKaryawan> {
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
                       backgroundColor: selectedIndex == 1 ? Colors.green : Colors.grey,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.zero
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                     ),
-                    child: Text(
-                      "PEMASUKAN",
-                      style: TextStyle(
-                        fontSize: 15,
-                      ),
+                    child: Text("PEMASUKAN",
+                      style: TextStyle(fontSize: 15),
                     ),
                     onPressed: () {
                       addIncome();
@@ -333,75 +326,69 @@ class inputKaryawanState extends State<inputKaryawan> {
                     },
                   ),
                 ),
-                
               ],
             ),
 
             SizedBox(height: 10.0),
             if (status == 'Pengeluaran')
-            TextField(
-              controller: kategori, 
-              readOnly: true,
-              decoration: InputDecoration(
-                icon: Icon(Icons.category_outlined),
-                labelText: "Kategori $status",
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    _showModal(pengeluaranData);
-                  },
-                  icon: Icon(Icons.add),
+              TextField(
+                controller: kategori,
+                readOnly: true,
+                decoration: InputDecoration(
+                  icon: Icon(Icons.category_outlined),
+                  labelText: "Kategori $status",
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      _showModal(pengeluaranData);
+                    },
+                    icon: Icon(Icons.add),
+                  ),
                 ),
               ),
-            ),
             if (status == 'Pemasukan')
-            TextField(
-              controller: kategori, 
-              readOnly: true,
-              decoration: InputDecoration(
-                icon: Icon(Icons.category_outlined),
-                labelText: "Kategori $status",
-                suffixIcon: IconButton(
-                  onPressed: () {                    
-                    _showModal(pemasukanData);
-                  },
-                  icon: Icon(Icons.add),
+              TextField(
+                controller: kategori,
+                readOnly: true,
+                decoration: InputDecoration(
+                  icon: Icon(Icons.category_outlined),
+                  labelText: "Kategori $status",
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      _showModal(pemasukanData);
+                    },
+                    icon: Icon(Icons.add),
+                  ),
                 ),
               ),
-            ),
-            
+
             SizedBox(height: 10.0),
             // TANGGAL
             TextField(
               controller: TextEditingController(
-                text: "${DateFormat ('EEEE, dd MMMM yyyy', 'id_ID'). format(selectedDate)}"
+                text: "${DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(selectedDate)}"
               ),
               decoration: InputDecoration(
-                icon: Icon(
-                  Icons.calendar_month_sharp
-                ), 
+                icon: Icon(Icons.calendar_month_sharp),
                 labelText: "Tanggal",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0))
-                )
-              ),
+                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5.0)))),
               readOnly: true,
               onTap: () {
                 showDatePicker(
-                  context: context, 
-                  initialDate: selectedDate, 
+                  context: context,
+                  initialDate: selectedDate,
                   firstDate: DateTime(2000),
-                  lastDate: DateTime(2101)
-                ).then((value) {
-                  if(value != null) {
-                    setState(() {
-                      selectedDate = value;
-                      print(selectedDate);
-                    });
+                  lastDate: DateTime(2101)).then((value) {
+                    if (value != null) {
+                      setState(() {
+                        selectedDate = value;
+                        print(selectedDate);
+                      });
+                    }
                   }
-                });
+                );
               },
             ),
-                       
+
             SizedBox(height: 10.0),
             // NOMINAL
             TextField(
@@ -410,54 +397,45 @@ class inputKaryawanState extends State<inputKaryawan> {
               decoration: InputDecoration(
                 icon: Icon(Icons.attach_money),
                 labelText: "Nominal",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0))
-                )
+                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5.0)))
               ),
               keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly
-              ], 
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
-            
+
             SizedBox(height: 10.0),
             // KETERANGAN
             TextField(
-              controller: keterangan, //editing controller of this TextField
+              controller: keterangan,
               decoration: InputDecoration(
-                  icon: Icon(Icons.edit_note_rounded), //icon of text field
-                  labelText: "Keterangan", //label text of field
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0))
-                  )
+                icon: Icon(Icons.edit_note_rounded),
+                labelText: "Keterangan",
+                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5.0)))
               ),
             ),
 
             SizedBox(height: 25.0),
             // TOMBOL SIMPAN
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center, 
-              children: <Widget>[
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.only(top:20),
-                    child: ElevatedButton(
-                      child: Text(
-                        "Tambah",
-                        style: TextStyle(fontSize: 15),
-                      ),
-                      onPressed: () {
-                        print('Id User : ${widget.level}');
-                        tambahTransaksi();
-                      },
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.only(top: 20),
+                  child: ElevatedButton(
+                    child: Text("Tambah",
+                      style: TextStyle(fontSize: 15),
                     ),
-                  ) 
+                    onPressed: () {
+                      print('Id User : ${widget.level}');
+                      tambahTransaksi();
+                    },
+                  ),
                 )
-              ]
-            ),
-          ]
-        ),
-      )
+              )
+            ]
+          ),
+        ]
+      ),
+    )
     );
   }
 }
