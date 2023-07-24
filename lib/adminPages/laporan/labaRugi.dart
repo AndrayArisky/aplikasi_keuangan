@@ -7,21 +7,33 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class labaRugi extends StatefulWidget {
   @override
   _labaRugiState createState() => _labaRugiState();
 }
 
+String? usaha = "", alamat = "";
+
 class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin {
   List<dynamic> dataTransaksi = [];
   List<dynamic> sortedDates = [];
   List<String> distinctMonthAndYear = [];
 
+  getPref() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      usaha = preferences.getString("usaha");
+      alamat = preferences.getString("alamat");
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     fetchData();
+    getPref();
   }
 
   void fetchData() async {
@@ -283,11 +295,22 @@ class _labaRugiState extends State<labaRugi> with SingleTickerProviderStateMixin
           header: (pw.Context context) {
             return pw.Header(
               level: 0,
-              child: pw.Text(
-                'Laporan Laba Rugi\n$monthAndYear',
-                style: pw.TextStyle(
-                  fontSize: 20, 
-                  fontWeight: pw.FontWeight.bold
+              child: pw.RichText(
+                text: pw.TextSpan(
+                  style: pw.TextStyle(
+                    fontSize: 20,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                  children: [
+                    pw.TextSpan(text: 'Laporan Laba Rugi\n$monthAndYear\n'),
+                    pw.TextSpan(
+                      text: '$usaha - $alamat',
+                      style: pw.TextStyle(
+                        fontSize: 16,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );
