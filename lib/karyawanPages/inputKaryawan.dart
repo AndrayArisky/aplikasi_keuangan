@@ -28,9 +28,9 @@ class Akun {
 }
 
 class inputKaryawan extends StatefulWidget {
-  final level;
+  final level, id_user;
   final VoidCallback onLogout;
-  const inputKaryawan({super.key, required this.level, required this.onLogout});
+  const inputKaryawan({super.key, required this.level, required this.onLogout, this.id_user});
 
   @override
   inputKaryawanState createState() => inputKaryawanState();
@@ -42,7 +42,7 @@ class inputKaryawanState extends State<inputKaryawan> {
   String status = 'Pengeluaran';
   DateTime selectedDate = DateTime.now();
   String _formatNominal = '';
-  //String id_user = '2';
+  String? id_user = "";
   String? selectedOption;
   String? selectedIdAkun;
 
@@ -57,12 +57,11 @@ class inputKaryawanState extends State<inputKaryawan> {
   void handleLogout() {
     widget.onLogout();
   }
-String? id_user = '';
+
   getPref() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
       id_user = preferences.getString("id_user");
-      
     });
   }
 
@@ -72,10 +71,12 @@ String? id_user = '';
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body) as List<dynamic>;
-      return data.map((item) => Tipe(
-        title: item['nm_akun'],
-        type: item['tipe'],
-      )).toList();
+      return data
+          .map((item) => Tipe(
+                title: item['nm_akun'],
+                type: item['tipe'],
+              ))
+          .toList();
     } else {
       throw Exception('Failed to fetch tipe data');
     }
@@ -87,11 +88,13 @@ String? id_user = '';
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body) as List<dynamic>;
-      return data.map((item) => Akun(
-        id_akun: int.parse(item['id_akun']),
-        nama: item['nm_akun'],
-        tipe: item['tipe'],
-      )).toList();
+      return data
+          .map((item) => Akun(
+                id_akun: int.parse(item['id_akun']),
+                nama: item['nm_akun'],
+                tipe: item['tipe'],
+              ))
+          .toList();
     } else {
       throw Exception('Failed to fetch tipe data');
     }
@@ -121,7 +124,8 @@ String? id_user = '';
 
   // FUNGSI TOMBOL SIMPAN
   void tambahTransaksi() async {
-    var url = Uri.parse('http://apkeu2023.000webhostapp.com/inputTransaksi.php');
+    var url =
+        Uri.parse('http://apkeu2023.000webhostapp.com/inputTransaksi.php');
     var selectedAccount = akunData.firstWhere(
       (account) => account.nama == selectedOption,
       orElse: () => Akun(id_akun: 0, nama: '', tipe: ''),
@@ -155,15 +159,11 @@ String? id_user = '';
                 child: Text("OK"),
                 onPressed: () {
                   Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => karyawanPage(
-                        level: 'karyawan', 
-                        onLogout: handleLogout
-                      )
-                    ),
-                    (route) => false
-                  );
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => karyawanPage(
+                              level: 'karyawan', onLogout: handleLogout)),
+                      (route) => false);
                 },
               )
             ],
@@ -272,8 +272,8 @@ String? id_user = '';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Tambah Transaksi'),
+        appBar: AppBar(
+          title: Text('Tambah Transaksi'),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {
@@ -301,8 +301,10 @@ String? id_user = '';
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: selectedIndex == 2 ? Colors.red : Colors.grey,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                      backgroundColor:
+                          selectedIndex == 2 ? Colors.red : Colors.grey,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero),
                     ),
                     child: Text(
                       "PENGELUARAN",
@@ -321,10 +323,13 @@ String? id_user = '';
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: selectedIndex == 1 ? Colors.green : Colors.grey,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                      backgroundColor:
+                          selectedIndex == 1 ? Colors.green : Colors.grey,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero),
                     ),
-                    child: Text("PEMASUKAN",
+                    child: Text(
+                      "PEMASUKAN",
                       style: TextStyle(fontSize: 15),
                     ),
                     onPressed: () {
@@ -375,27 +380,28 @@ String? id_user = '';
             // TANGGAL
             TextField(
               controller: TextEditingController(
-                text: "${DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(selectedDate)}"
-              ),
+                  text:
+                      "${DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(selectedDate)}"),
               decoration: InputDecoration(
-                icon: Icon(Icons.calendar_month_sharp),
-                labelText: "Tanggal",
-                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5.0)))),
+                  icon: Icon(Icons.calendar_month_sharp),
+                  labelText: "Tanggal",
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5.0)))),
               readOnly: true,
               onTap: () {
                 showDatePicker(
-                  context: context,
-                  initialDate: selectedDate,
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2101)).then((value) {
-                    if (value != null) {
-                      setState(() {
-                        selectedDate = value;
-                        print(selectedDate);
-                      });
-                    }
+                        context: context,
+                        initialDate: selectedDate,
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2101))
+                    .then((value) {
+                  if (value != null) {
+                    setState(() {
+                      selectedDate = value;
+                      print(selectedDate);
+                    });
                   }
-                );
+                });
               },
             ),
 
@@ -405,10 +411,10 @@ String? id_user = '';
               controller: nominal,
               onChanged: formatNominal,
               decoration: InputDecoration(
-                icon: Icon(Icons.attach_money),
-                labelText: "Nominal",
-                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5.0)))
-              ),
+                  icon: Icon(Icons.attach_money),
+                  labelText: "Nominal",
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5.0)))),
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
@@ -418,34 +424,31 @@ String? id_user = '';
             TextField(
               controller: keterangan,
               decoration: InputDecoration(
-                icon: Icon(Icons.edit_note_rounded),
-                labelText: "Keterangan",
-                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5.0)))
-              ),
+                  icon: Icon(Icons.edit_note_rounded),
+                  labelText: "Keterangan",
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5.0)))),
             ),
 
             SizedBox(height: 25.0),
             // TOMBOL SIMPAN
             Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
               Expanded(
-                child: Container(
-                  padding: EdgeInsets.only(top: 20),
-                  child: ElevatedButton(
-                    child: Text("Tambah",
-                      style: TextStyle(fontSize: 15),
-                    ),
-                    onPressed: () {
-                      print('Id User : ${widget.level}');
-                      tambahTransaksi();
-                    },
+                  child: Container(
+                padding: EdgeInsets.only(top: 20),
+                child: ElevatedButton(
+                  child: Text(
+                    "Tambah",
+                    style: TextStyle(fontSize: 15),
                   ),
-                )
-              )
-            ]
-          ),
-        ]
-      ),
-    )
-    );
+                  onPressed: () {
+                    print('Id User : ${widget.id_user}');
+                    tambahTransaksi();
+                  },
+                ),
+              ))
+            ]),
+          ]),
+        ));
   }
 }
