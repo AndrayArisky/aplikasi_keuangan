@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Tipe {
   final String title;
@@ -41,7 +42,7 @@ class inputKaryawanState extends State<inputKaryawan> {
   String status = 'Pengeluaran';
   DateTime selectedDate = DateTime.now();
   String _formatNominal = '';
-  String id_user = '2';
+  //String id_user = '2';
   String? selectedOption;
   String? selectedIdAkun;
 
@@ -55,6 +56,14 @@ class inputKaryawanState extends State<inputKaryawan> {
 
   void handleLogout() {
     widget.onLogout();
+  }
+String? id_user = '';
+  getPref() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      id_user = preferences.getString("id_user");
+      
+    });
   }
 
   Future<List<Tipe>> fetchTipeData() async {
@@ -91,6 +100,7 @@ class inputKaryawanState extends State<inputKaryawan> {
   @override
   void initState() {
     super.initState();
+    getPref();
     fetchTipeData().then((data) {
       setState(() {
         pemasukanData = data.where((tipe) => tipe.type == 'pm').toList();

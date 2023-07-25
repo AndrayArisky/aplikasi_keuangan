@@ -341,7 +341,8 @@ class _transaksiKaryawanState extends State<transaksiKaryawan> {
                                     // Menampilkan data total pemasukan dan pengeluaran
                                     return Padding(
                                       padding: const EdgeInsets.all(2.0),
-                                      child: ListTile(     
+                                      child: ListTile(   
+                                        onTap: () {},  
                                         subtitle: Row(
                                           children: [
                                             transactions[index]['status'] ==  'Pemasukan' ? Icon(Icons.download,

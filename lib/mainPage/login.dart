@@ -96,7 +96,7 @@ class _loginPageState extends State<loginPage> {
       preferences.setString('alamat', alamat);
       preferences.setString("usaha", usaha);
       preferences.setString("level", level);
-      preferences.setString("id", id_user);
+      preferences.setString("id_user", id_user);
     });
   }
 
