@@ -27,7 +27,9 @@ class _profilKaryawanState extends State<profilKaryawan>{
   }
 
   void handleLogout() {
-    widget.onLogout();
+    setState(() {
+      widget.onLogout();
+    });
   }
 
   @override

@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'package:aplikasi_keuangan/LOGOUT/krywnPage.dart';
-import 'package:aplikasi_keuangan/adminPages/adminPage.dart';
 import 'package:aplikasi_keuangan/karyawanPages/karyawanPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

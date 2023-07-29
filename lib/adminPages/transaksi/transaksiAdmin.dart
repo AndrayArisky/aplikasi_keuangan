@@ -1,14 +1,10 @@
 import 'dart:convert';
-import 'package:aplikasi_keuangan/PERCOBAAN/ADMIN/editLast.dart';
-import 'package:aplikasi_keuangan/PERCOBAAN/ADMIN/edithapus.dart';
 import 'package:aplikasi_keuangan/adminPages/transaksi/editTransaksi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
-
-import '../../PERCOBAAN/bismillahEdit.dart';
 
 class transaksiAdmin extends StatefulWidget {
   @override
@@ -343,7 +339,9 @@ class _transaksiAdminState extends State<transaksiAdmin> {
                                                 ],
                                               ),
                                             ),
-                                            Text('Rp. ${transactions[index]['nominal']}',
+                                            Text(
+                                              //'Rp. ${transactions[index]['nominal']}',
+                                              '${rupiah.format(int.parse(transactions[index]['nominal']))}',
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.bold,
