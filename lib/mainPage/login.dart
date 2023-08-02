@@ -43,14 +43,15 @@ class _loginPageState extends State<loginPage> {
     final data = jsonDecode(response.body);
     int value = data['value'];
     String pesan = data['message'];
-    String namaAPI = data['nama'];
-    String nohp = data['nohp'];
-    String email = data['email'];
-    String alamat = data['alamat'];
-    String usaha = data['usaha'];
-    String level = data['level'];
-    String id_user = data['id_user'];
+
     if (value == 1) {
+      String namaAPI = data['nama'];
+      String nohp = data['nohp'];
+      String email = data['email'];
+      String alamat = data['alamat'];
+      String usaha = data['usaha'];
+      String level = data['level'];
+      String id_user = data['id_user'];
       setState(() {
         _statusLogin = level == "admin" ? statusLogin.loginAdmin : statusLogin.loginKaryawan;
         savePref(value, namaAPI, nohp, email, alamat, usaha, level, id_user);
@@ -67,14 +68,32 @@ class _loginPageState extends State<loginPage> {
       clearTextFields();
       print(pesan);
     } else {
-      WidgetsBinding.instance?.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Gagal masuk! Periksa username and password.'),
-            duration: Duration(seconds: 2)
-          ),
-        );
-      });
+      // String snackbarMessage = 'Gagal masuk! Periksa username and password!';
+      // WidgetsBinding.instance?.addPostFrameCallback((_) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text(snackbarMessage),
+      //       duration: Duration(seconds: 2)
+      //     ),
+      //   );
+      // });
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Login gagal"),
+            content:Text("Periksa kembali username dan password!"),
+            actions: <Widget>[
+              ElevatedButton(
+                child: Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
     }
   } 
 
@@ -181,6 +200,12 @@ class _loginPageState extends State<loginPage> {
                       title: TextFormField(
                         style: const TextStyle(color: Colors.blue),
                         obscureText: secureText,
+                        validator: (e) {
+                          if (e!.isEmpty) {
+                            return 'Password tidak boleh kosong';
+                          }
+                          return null;
+                        },
                         onSaved: (e) {
                           password = e!;
                         },

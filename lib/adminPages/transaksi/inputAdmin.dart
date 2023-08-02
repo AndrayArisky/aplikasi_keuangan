@@ -384,7 +384,7 @@ class inputAdminState extends State<inputAdmin> {
                        
             SizedBox(height: 10.0),
             // NOMINAL
-            TextField(
+            TextFormField(
               controller: nominal,
               onChanged: formatNominal,
               decoration: InputDecoration(

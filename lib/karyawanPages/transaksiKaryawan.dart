@@ -365,13 +365,6 @@ class _transaksiKaryawanState extends State<transaksiKaryawan> {
                                                 ],
                                               ),
                                             ),
-                                            // Text('Rp. ${transactions[index]['nominal']}',
-                                            //   style: TextStyle(
-                                            //     fontSize: 14,
-                                            //     fontWeight: FontWeight.bold,
-                                            //     color: Colors.black
-                                            //   ),
-                                            // ),
                                              Text(
                                               '${rupiah.format(int.parse(transactions[index]['nominal']))}',
                                               style: TextStyle(

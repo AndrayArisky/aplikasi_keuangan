@@ -340,7 +340,6 @@ class _transaksiAdminState extends State<transaksiAdmin> {
                                               ),
                                             ),
                                             Text(
-                                              //'Rp. ${transactions[index]['nominal']}',
                                               '${rupiah.format(int.parse(transactions[index]['nominal']))}',
                                               style: TextStyle(
                                                 fontSize: 14,
